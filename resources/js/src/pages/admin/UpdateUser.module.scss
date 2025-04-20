@@ -1,0 +1,167 @@
+// resources/js/src/components/Admin/UpdateUser.module.scss
+@import '../../../../sass/variables';
+
+:local {
+  .container {
+    max-width: 1280px;
+    padding: 20px;
+  }
+
+  .card {
+    padding: 24px;
+  }
+
+  .success {
+    color: #10b981;
+    background-color: #f0fdf4;
+    padding: 8px 16px;
+    border-radius: 4px;
+    margin-bottom: 16px;
+  }
+
+  .loading {
+    color: #555;
+    text-align: center;
+    padding: 20px;
+  }
+
+  .avatarPreview {
+    margin-bottom: 10px;
+    img {
+      width: 100px;
+      height: 100px;
+      object-fit: cover;
+      border-radius: 8px;
+    }
+  }
+
+  .section {
+    margin-bottom: 32px;
+  }
+
+  .sectionTitle {
+    font-size: 20px;
+    font-weight: 600;
+    color: #1f2937;
+    margin-bottom: 16px;
+    border-bottom: 1px solid #e5e7eb;
+    padding-bottom: 8px;
+  }
+
+  .row {
+    display: flex;
+    gap: 16px;
+    margin-bottom: 16px;
+
+    .inputGroup {
+      flex: 1;
+      margin-bottom: 0;
+    }
+  }
+
+  .inputGroup {
+    margin-bottom: 16px;
+
+    label {
+      display: block;
+      font-size: 14px;
+      font-weight: 500;
+      color: #374151;
+      margin-bottom: 4px;
+    }
+
+    .input {
+      width: 100%;
+      padding: 8px 12px;
+      font-size: 14px;
+      color: #1f2937;
+      background-color: #f9fafb;
+      border: 1px solid #d1d5db;
+      border-radius: 4px;
+      transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+
+      &:focus {
+        outline: none;
+        border-color: darken($accent-color, 10%);
+        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+      }
+    }
+
+    .inputFilled {
+      border-color: $accent-color;
+    }
+
+    .inputError {
+      border-color: #ef4444;
+      background-color: #fef2f2;
+    }
+
+    textarea.input {
+      min-height: 80px;
+      resize: vertical;
+    }
+  }
+
+  .passwordWrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+
+    .input {
+      padding-right: 80px;
+    }
+  }
+
+  .passwordToggle {
+    position: absolute;
+    right: 8px;
+    background: none;
+    border: none;
+    color: $accent-color;
+    font-size: 14px;
+    cursor: pointer;
+    padding: 4px 8px;
+
+    &:hover {
+      color: darken($accent-color, 10%);
+    }
+  }
+
+  .error {
+    display: block;
+    color: #ef4444;
+    font-size: 12px;
+    margin-top: 4px;
+  }
+
+  .actions {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 24px;
+  }
+
+  .submitButton {
+    background-color: $accent-color;
+    color: #fff;
+    font-weight: 500;
+    padding: 8px 16px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.15s ease-in-out;
+
+    &:hover {
+      background-color: darken($accent-color, 10%);
+    }
+
+    &:focus {
+      outline: none;
+      box-shadow: 0 0 0 3px darken($accent-color, 10%);
+    }
+
+    &:disabled {
+      background-color: #cccccc;
+      cursor: not-allowed;
+    }
+  }
+}

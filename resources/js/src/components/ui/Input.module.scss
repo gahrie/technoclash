@@ -1,0 +1,58 @@
+@import '../../../../sass/variables';
+
+.ui-input-container {
+  position: relative;
+  flex: 1;
+}
+
+
+.ui-input {
+  width: 100%;
+  padding: 10px;
+  border: 2px solid $line;
+  border-radius: 4px;
+  transition: border-color 0.3s ease-in-out;
+  background: transparent;
+  font-size: 16px;
+  &:focus {
+    outline: none;
+    border-color: $primary;
+  }
+
+  &--filled {
+    border-color: $primary;
+  }
+
+  &--error {
+    border-color: $error;
+  }
+
+  &:focus + .ui-input-span,
+  &--filled + .ui-input-span {
+    font-size: 12px;
+    font-weight: bold;
+    color: $gray;
+    background: $white;
+    padding: 0 5px;
+    left: 5px;
+    top: 0;
+  }
+}
+
+.ui-input-span {
+  position: absolute;
+  top: 50%;
+  left: 10px;
+  transform: translateY(-50%);
+  color: $gray;
+  font-size: 16px;
+  pointer-events: none;
+  transition: all 0.2s ease-in-out;
+}
+
+.ui-input--no-float {
+  padding: 10px;
+  height: 100px;
+  font-size: 48px;
+  text-align: center;
+}

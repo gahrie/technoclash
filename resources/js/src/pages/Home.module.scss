@@ -1,0 +1,178 @@
+@import "../../../sass/variables";
+
+.home {
+  max-width: 1280px;
+  margin: 0 auto;
+
+  .hero {
+    height: 1000px;
+    background-image: url("../assets/images/section_onee.svg");
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+
+    &-content {
+      padding-top: 150px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+
+      h1 {
+        font-weight: normal;
+        letter-spacing: -5px;
+        text-shadow: 2px 4px 5px rgba(0, 0, 0, 0.3);
+        font-size: 5rem;
+
+        span {
+          color: $primary;
+        }
+      }
+
+      p {
+        color: $gray;
+        font-size: 1.5rem;
+        margin-bottom: 20px;
+      }
+
+      .hero-cta {
+        background-color: $black;
+        padding: 15px 25px;
+        border: none;
+        border-radius: 5px;
+        font-size: 1.2rem;
+        color: $white;
+        text-decoration: none;
+        transition: background-color 0.3s;
+
+        &:hover,
+        &:focus {
+          background-color: $primary;
+        }
+      }
+    }
+  }
+
+  .features {
+    padding: 100px 5% 0;
+
+    &-header {
+      margin-bottom: 100px;
+      font-size: 3rem;
+      text-align: center;
+
+      span {
+        color: $primary;
+      }
+    }
+
+    &-content {
+      .feature {
+        width: 100%;
+        height: 500px;
+        display: flex;
+        align-items: center;
+        gap: 40px;
+        padding: 50px 0;
+        border-radius: 10px;
+
+        &-description {
+          flex: 1;
+          line-height: 30px;
+
+          h2 {
+            font-size: 2rem;
+            margin-bottom: 20px;
+          }
+
+          ul {
+            list-style: circle;
+            padding-left: 20px;
+          }
+        }
+
+        &-tutorial {
+          width: 40%;
+          height: 100%;
+
+          iframe,
+          .video-placeholder {
+            width: 100%;
+            height: 100%;
+            border-radius: 8px;
+          }
+
+          .video-placeholder {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(0, 0, 0, 0.6);
+            color: $white;
+            font-size: 1.5rem;
+            text-align: center;
+            animation: glowing 1.5s infinite alternate;
+          }
+        }
+
+        &-left {
+          flex-direction: row;
+        }
+
+        &-right {
+          flex-direction: row-reverse;
+        }
+      }
+    }
+  }
+
+  .leaderboard {
+    height: 1000px;
+    padding: 100px 5%;
+
+    h2 {
+      font-size: 3rem;
+      text-align: center;
+      margin-bottom: 100px;
+
+      span {
+        color: $primary;
+      }
+    }
+
+    &-content {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      width: 100%;
+      height: 800px;
+      border-radius: 20px;
+      background-color: $black;
+      background-image: url("../assets/images/section_twooo.svg");
+      background-position: center;
+      background-repeat: no-repeat;
+      background-size: cover;
+      color: $gray;
+      font-size: 3rem;
+    }
+  }
+
+  @media (max-width: 768px) {
+    .feature {
+      flex-direction: column !important;
+      text-align: center;
+
+      &-tutorial {
+        width: 100%;
+      }
+    }
+  }
+
+  @keyframes glowing {
+    from {
+      box-shadow: 0 0 5px $primary;
+    }
+    to {
+      box-shadow: 0 0 20px $primary;
+    }
+  }
+}

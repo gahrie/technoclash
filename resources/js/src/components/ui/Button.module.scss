@@ -1,0 +1,74 @@
+@import "../../../../sass/variables";
+
+.ui-button {
+  border: none;
+  border-radius: 5px;
+  font-size: 1.2rem;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background-color 0.3s;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 0;
+
+  &--primary {
+    background-color: $black;
+    color: $white;
+    &:hover,
+    &:focus {
+      text-decoration: none;
+      background-color: $primary;
+    }
+  }
+
+  &--secondary {
+    background-color: $primary;
+    color: $white;
+    &:hover,
+    &:focus {
+      text-decoration: none;
+      background-color: darken($primary, 10%);
+    }
+  }
+
+  &--icon {
+    background: none;
+    color: $black;
+    font-size: 1.5rem;
+    padding: 0.5rem;
+    border-radius: 4px;
+
+    &:hover,
+    &:focus {
+      color: $primary;
+      background: rgba(0, 0, 0, 0.05);
+    }
+  }
+
+  &[disabled] {
+    background-color: $disabled;
+    cursor: not-allowed;
+  }
+
+  .spinner {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    border: 3px solid $white;
+    border-top: 3px solid transparent;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+  }
+
+  .button-content-hidden {
+    visibility: hidden;
+  }
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}

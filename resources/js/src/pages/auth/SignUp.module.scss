@@ -1,0 +1,169 @@
+@import '../../../../sass/variables';
+
+.content {
+  width: 100%;
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 0 40px 40px;
+  background-color: rgba(255, 255, 255, 0.9);
+  border-radius: 8px;
+
+  h1 {
+    font-size: 2rem;
+    margin-bottom: 20px;
+    text-align: center;
+    color: $black;
+  }
+
+  p {
+    margin-top: 15px;
+    text-align: center;
+    font-size: 14px;
+  }
+}
+
+.form-group {
+  margin-bottom: 20px;
+}
+
+.error {
+  color: #ff4d4d;
+  font-size: 0.875rem;
+  text-align: left;
+  margin-bottom: 1rem;
+}
+
+.password-wrapper {
+  display: flex;
+  align-items: center;
+  position: relative;
+  border: 2px solid $line;
+  border-radius: 4px;
+
+  &:focus-within {
+    border-color: #ffae00;
+    outline: none;
+  }
+
+  &.filled {
+    border-color: #ffae00;
+    outline: none;
+  }
+
+  .icons {
+    display: flex;
+    align-items: center;
+  }
+}
+
+.password, .confirmPassword {
+  border: none;
+}
+
+.toggle-icon,
+.info-icon {
+  margin-right: 10px;
+  cursor: pointer;
+  font-size: 16px;
+  display: flex;
+  align-items: center;
+}
+
+.info-icon {
+  position: relative;
+
+  &:hover .tooltip-content {
+    display: block;
+  }
+
+  .tooltip-content {
+    display: none;
+    position: absolute;
+    white-space: nowrap;
+    right: 0;
+    top: 25px;
+    background-color: #fff;
+    border: 1px solid $line;
+    border-radius: 5px;
+    padding: 10px;
+    font-size: 12px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    z-index: 10;
+
+    ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    .check-icon {
+      color: $accent-color;
+      font-size: 14px;
+      margin-right: 5px;
+    }
+
+    .times-icon {
+      color: #ff4d4d;
+      font-size: 14px;
+      margin-right: 5px;
+    }
+  }
+}
+
+.password-strength {
+  margin-top: 5px;
+
+  label {
+    display: block;
+    font-size: 14px;
+    color: $gray;
+  }
+
+  .strength-label {
+    font-size: 14px;
+    font-weight: 500;
+  }
+}
+
+.code-inputs {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  margin: 20px 0;
+}
+
+
+.modal {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: rgba(0, 0, 0, 0.8);
+  padding: 15px 25px;
+  border-radius: 5px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+  z-index: 1000;
+  animation: fadeInOut 1s ease-in-out forwards;
+
+  p {
+    color: white;
+  }
+}
+
+.success-message {
+  text-align: center;
+  margin: 20px 0;
+  color: $gray;
+
+  p {
+    margin: 10px 0;
+    font-size: 16px;
+  }
+}
+
+@keyframes fadeInOut {
+  0% { opacity: 0; }
+  20% { opacity: 1; }
+  80% { opacity: 1; }
+  100% { opacity: 0; }
+}

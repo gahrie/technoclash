@@ -1,0 +1,16 @@
+@import '../../../../sass/variables';
+
+.ui-link {
+  color: $primary;
+  text-decoration: none;
+
+  &:hover {
+    text-decoration: underline;
+  }
+
+  &--disabled {
+    color: $disabled;
+    pointer-events: none;
+    cursor: not-allowed;
+  }
+}

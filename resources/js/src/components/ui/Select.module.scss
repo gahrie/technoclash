@@ -1,0 +1,36 @@
+@import '../../../../sass/variables';
+
+.ui-select-container {
+  position: relative;
+  margin-bottom: 15px;
+}
+
+.ui-select {
+  width: 100%;
+  padding: 10px;
+  border: 2px solid $line;
+  border-radius: 4px;
+  transition: border-color 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+  background: white;
+  appearance: none;
+  cursor: pointer;
+
+  &:focus {
+    outline: none;
+    border-color: $primary;
+  }
+
+  &--filled {
+    border-color: $primary;
+  }
+
+  &--error {
+    border-color: $error;
+  }
+}
+
+.ui-select-error {
+  color: $error;
+  font-size: 0.875rem;
+  margin-top: 5px;
+}

@@ -1,0 +1,70 @@
+{
+  "resources/js/src/assets/fonts/Mokoto.ttf": {
+    "file": "assets/Mokoto-DIykHdg5.ttf",
+    "src": "resources/js/src/assets/fonts/Mokoto.ttf"
+  },
+  "resources/js/src/assets/fonts/Roboto.ttf": {
+    "file": "assets/Roboto-WOy3sDCz.ttf",
+    "src": "resources/js/src/assets/fonts/Roboto.ttf"
+  },
+  "resources/js/src/assets/fonts/Satoshi-Bold.ttf": {
+    "file": "assets/Satoshi-Bold-CPly9kH5.ttf",
+    "src": "resources/js/src/assets/fonts/Satoshi-Bold.ttf"
+  },
+  "resources/js/src/assets/fonts/Satoshi-Medium.ttf": {
+    "file": "assets/Satoshi-Medium-DOt9kM-a.ttf",
+    "src": "resources/js/src/assets/fonts/Satoshi-Medium.ttf"
+  },
+  "resources/js/src/assets/fonts/Tomorrow.ttf": {
+    "file": "assets/Tomorrow-BS0mjboF.ttf",
+    "src": "resources/js/src/assets/fonts/Tomorrow.ttf"
+  },
+  "resources/js/src/assets/fonts/Verdana.ttf": {
+    "file": "assets/Verdana-C7PMkQes.ttf",
+    "src": "resources/js/src/assets/fonts/Verdana.ttf"
+  },
+  "resources/js/src/assets/images/section_onee.svg": {
+    "file": "assets/section_onee-Db_Y-jwH.svg",
+    "src": "resources/js/src/assets/images/section_onee.svg"
+  },
+  "resources/js/src/assets/images/section_twooo.svg": {
+    "file": "assets/section_twooo-D-TbIf2_.svg",
+    "src": "resources/js/src/assets/images/section_twooo.svg"
+  },
+  "resources/js/src/index.jsx": {
+    "file": "assets/index-BPK6u6vF.js",
+    "name": "index",
+    "src": "resources/js/src/index.jsx",
+    "isEntry": true,
+    "dynamicImports": [
+      "resources/js/src/pages/client/StudentChallengeList.module.scss"
+    ],
+    "css": [
+      "assets/index-DXHwmS-R.css"
+    ],
+    "assets": [
+      "assets/section_onee-Db_Y-jwH.svg",
+      "assets/section_twooo-D-TbIf2_.svg",
+      "assets/Mokoto-DIykHdg5.ttf",
+      "assets/Satoshi-Medium-DOt9kM-a.ttf",
+      "assets/Satoshi-Bold-CPly9kH5.ttf",
+      "assets/Verdana-C7PMkQes.ttf",
+      "assets/Roboto-WOy3sDCz.ttf",
+      "assets/Tomorrow-BS0mjboF.ttf"
+    ]
+  },
+  "resources/js/src/pages/client/StudentChallengeList.module.scss": {
+    "file": "assets/StudentChallengeList.module-CNdtr3uL.js",
+    "name": "StudentChallengeList.module",
+    "src": "resources/js/src/pages/client/StudentChallengeList.module.scss",
+    "isDynamicEntry": true,
+    "css": [
+      "assets/StudentChallengeList-BJv0NM1_.css"
+    ]
+  },
+  "resources/sass/app.scss": {
+    "file": "assets/app-D0rPjCbJ.css",
+    "src": "resources/sass/app.scss",
+    "isEntry": true
+  }
+}
