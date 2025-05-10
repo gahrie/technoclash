@@ -1,137 +1,140 @@
 @import "../../../sass/variables";
+@import "../../../sass/global.scss";
 
 .navbar {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 1.5rem 5%;
-  background: $navbar-bg;
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: $navbar-height;
-  z-index: 1000;
-  transition: $transition;
-
-  &-sticky {
-    padding: 1rem 5%;
-    background: $navbar-bg-sticky;
-    box-shadow: $navbar-shadow;
-  }
-
-  &-brand {
-    .navbar-logo {
-      display: inline-block;
-      font-size: 1.5rem;
-      font-weight: 700;
-      color: $black;
-      text-decoration: none;
-      transition: $transition;
-
-      &:hover,
-      &:focus {
-        color: $primary;
-        outline: none;
-      }
-    }
-  }
-
-  &-toggle {
-    display: none;
-    background: none;
-    border: none;
-    font-size: 1.5rem;
-    color: $black;
-    cursor: pointer;
-    padding: 0.5rem;
-
-    @media (max-width: 768px) {
-      display: block;
-    }
-  }
-
-  &-menu {
-    &-desktop {
-      display: flex;
-
-      @media (max-width: 768px) {
-        display: none;
-      }
-    }
-
-    @media (max-width: 768px) {
-      width: 100%;
-      position: absolute;
-      top: $navbar-height;
-      left: 0;
-      background: $navbar-bg-sticky;
-      box-shadow: $navbar-shadow;
-    }
-  }
-
-  &-links {
     display: flex;
-    gap: 2rem;
+    justify-content: space-between;
     align-items: center;
-    list-style: none;
-    margin: 0;
-    padding: 0;
+    padding: 1.5rem 5%;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 1000;
+    transition: padding 0.5s ease, box-shadow 0.5s ease; /* Smooth sticky transition */
+    background-color: var(--secondary-bg);
 
-    @media (max-width: 768px) {
-      flex-direction: column;
-      padding: 1rem;
-      gap: 1rem;
-    }
-  }
-
-
-  &-link {
-    display: inline-block;
-    color: $black;
-    text-decoration: none;
-    font-weight: 500;
-    padding: 0.5rem 1rem;
-    border-radius: 4px;
-    transition: $transition;
-
-    &:hover {
-      text-decoration: none;
-      color: $primary;
-      background: rgba(0, 0, 0, 0.05);
-      outline: none;
+    &-sticky {
+        padding: 1rem 5%;
+        box-shadow: $shadow;
     }
 
-    &-active {
-      color: $primary;
+    &-brand {
+        .navbar-logo {
+            display: inline-block;
+            font-size: 1.5rem;
+            font-weight: 700;
+            text-decoration: none;
+            transition: $transition;
+            color: var(--text);
+            span {
+                color: $primary;
+            }
+        }
     }
 
-    &:focus {
-      color: $primary;
-      transform: scale(1.05);
+    &-toggle {
+        display: none;
+        background: none;
+        border: none;
+        cursor: pointer;
+        padding: 0.5rem;
+
+        @media (max-width: 768px) {
+            display: block;
+        }
     }
 
-    &-cta {
-      display: inline-block;
-      background: $primary;
-      color: $white;
-      border-radius: 30px;
-      padding: 0.8rem 2rem;
-    
-      &:hover {
+    &-menu {
+        &-desktop {
+            display: none;
+
+            @media (max-width: 768px) {
+                display: flex;
+            }
+        }
+
+        @media (max-width: 768px) {
+            width: 100%;
+            position: absolute;
+            top: 70px;
+            left: 0;
+            box-shadow: $shadow;
+            background-color: var(--secondary-bg);
+            visibility: hidden; /* Hidden by default */
+            opacity: 0;
+            transform: translateY(-20px);
+            transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out,
+                visibility 0.3s;
+        }
+
+        &-open {
+            @media (max-width: 768px) {
+                visibility: visible; /* Show when open */
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    }
+
+    &-links {
+        display: flex;
+        gap: 2rem;
+        align-items: center;
+        list-style: none;
+        margin: 0;
+        padding: 0;
+
+        @media (max-width: 768px) {
+            flex-direction: column;
+            padding: 1rem;
+            gap: 1rem;
+        }
+    }
+
+    &-link {
+        display: inline-block;
         text-decoration: none;
-        background: darken($primary, 10%);
-        color: $white;
-        transform: translateY(-2px);
-        box-shadow: 0 4px 15px rgba($primary, 0.3);
-      }
+        font-weight: 500;
+        padding: 0.8rem 1rem;
+        border-radius: 4px;
+        color: var(--text);
+        transition: $transition;
 
-      &:focus {
-        background: $primary;
-        color: $white;
-        transform: scale(1.05);
-      }
+        &:hover {
+            text-decoration: none;
+            color: $primary;
+            outline: none;
+        }
+
+        &-active {
+            color: $primary;
+        }
+
+        &:focus {
+            color: $primary;
+            transform: scale(1.05);
+        }
+
+        &-cta {
+            display: inline-block;
+            background: $primary;
+            border-radius: 30px;
+            padding: 0.8rem 2rem;
+            color: #fff;
+            &:hover {
+                text-decoration: none;
+                background: $primary-hover;
+                color: #fff;
+                transform: translateY(-2px);
+                box-shadow: 0 4px 15px rgba($primary, 0.3);
+            }
+
+            &:focus {
+                color: #fff;
+                background: $primary;
+                transform: scale(1.05);
+            }
+        }
     }
-    
-  }
 }

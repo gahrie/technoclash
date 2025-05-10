@@ -1,36 +1,68 @@
-@import '../../../../sass/variables';
+@import "../../../../sass/variables";
+@import "../../../../sass/global.scss";
 
 .ui-select-container {
-  position: relative;
-  margin-bottom: 15px;
+    position: relative;
+    margin-bottom: 15px;
+}
+
+.ui-select-wrapper {
+    position: relative;
 }
 
 .ui-select {
-  width: 100%;
-  padding: 10px;
-  border: 2px solid $line;
-  border-radius: 4px;
-  transition: border-color 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
-  background: white;
-  appearance: none;
-  cursor: pointer;
+    width: 100%;
+    padding: 15px 10px 5px;
+    border: 2px solid var(--border);
+    border-radius: 4px;
+    transition: border-color 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+    appearance: none;
+    background-color: var(--secondary-bg);
+    cursor: pointer;
+    color: var(--text);
+    font-size: 14px;
 
-  &:focus {
-    outline: none;
-    border-color: $primary;
-  }
+    &:focus {
+        outline: none;
+        border-color: $primary;
+    }
 
-  &--filled {
-    border-color: $primary;
-  }
+    &--error {
+        border-color: $error;
+    }
 
-  &--error {
-    border-color: $error;
-  }
+    &:focus + .ui-select-span,
+    &--filled + .ui-select-span {
+        color: $primary;
+        font-size: 10px;
+        font-weight: bold;
+        padding: 0 5px;
+        left: 5px;
+        top: 10px;
+    }
+}
+
+.ui-select-span {
+    position: absolute;
+    top: 50%;
+    left: 10px;
+    transform: translateY(-50%);
+    color: var(--placeholder);
+    font-size: 14px;
+    pointer-events: none;
+    transition: all 0.2s ease-in-out;
+}
+
+.ui-select-span--float {
+    font-size: 12px;
+    font-weight: bold;
+    padding: 0 5px;
+    left: 5px;
+    top: 0;
 }
 
 .ui-select-error {
-  color: $error;
-  font-size: 0.875rem;
-  margin-top: 5px;
+    color: $error;
+    font-size: 0.875rem;
+    margin-top: 5px;
 }

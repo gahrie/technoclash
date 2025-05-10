@@ -49,8 +49,13 @@ const SignUpCredentials = () => {
     return { lengthCheck, upperCheck, lowerCheck, numberCheck, specialCheck };
   };
 
+  const isGmail = (email) => {
+    return /@gmail\.com$/i.test(email);
+  };
+
   const handleEmailChange = (e) => {
-    setEmail(e.target.value.replace(/\s/g, ''));
+    const newEmail = e.target.value.replace(/\s/g, '');
+    setEmail(newEmail);
     setError({ ...error, email: '' });
   };
 
@@ -66,6 +71,11 @@ const SignUpCredentials = () => {
     setError({ ...error, confirmPassword: '' });
   };
 
+  const handleSignInClick = () => {
+    localStorage.removeItem('signup_email');
+    localStorage.removeItem('registration_progress');
+  };
+
   const togglePasswordVisibility = () => setShowPassword(!showPassword);
   const toggleConfirmPasswordVisibility = () => setShowConfirmPassword(!showConfirmPassword);
 
@@ -73,6 +83,12 @@ const SignUpCredentials = () => {
     e.preventDefault();
     setError({ email: '', password: '', confirmPassword: '', general: '' });
     setLoading(true);
+
+    if (!isGmail(email)) {
+      setError({ ...error, email: 'Please use a Gmail address' });
+      setLoading(false);
+      return;
+    }
 
     const { lengthCheck, upperCheck, lowerCheck, numberCheck, specialCheck } = checkPasswordStrength(password);
     if (!(lengthCheck && upperCheck && lowerCheck && numberCheck && specialCheck)) {
@@ -120,14 +136,14 @@ const SignUpCredentials = () => {
               id="email"
               value={email}
               onChange={handleEmailChange}
-              placeholder="Email"
+              placeholder="Email (Gmail only)"
               required
             />
             {error.email && <p className={styles.error}>{error.email}</p>}
           </div>
 
           <div className={styles['form-group']}>
-            <div className={clsx(styles['password-wrapper'], { [styles.filled]: password })}>
+            <div className={styles['password-wrapper']}>
               <Input
                 type={showPassword ? 'text' : 'password'}
                 id="password"
@@ -185,7 +201,7 @@ const SignUpCredentials = () => {
           </div>
 
           <div className={styles['form-group']}>
-            <div className={clsx(styles['password-wrapper'], { [styles.filled]: confirmPassword })}>
+            <div className={styles['password-wrapper']}>
               <Input
                 type={showConfirmPassword ? 'text' : 'password'}
                 id="confirmPassword"
@@ -204,12 +220,12 @@ const SignUpCredentials = () => {
             {error.confirmPassword && <p className={styles.error}>{error.confirmPassword}</p>}
           </div>
 
-          <Button variant='secondary' type="submit" loading={loading}>
+          <Button variant='form' type="submit" loading={loading}>
             Next
           </Button>
         </form>
         <p>
-          Already have an account? <CustomLink to="/login">Sign in</CustomLink>
+          Already have an account? <CustomLink to="/login" onClick={handleSignInClick}>Sign in</CustomLink>
         </p>
       </div>
     </div>

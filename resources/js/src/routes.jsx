@@ -31,6 +31,11 @@ import UpdateChallenge from './pages/admin/UpdateChallenge';
 import StudentChallengeList from './pages/client/StudentChallengeList';
 import StudentChallengeDetail from './pages/client/StudentChallengeDetail';
 
+
+import { UserListProvider } from "./context/UserListContext"; // Adjust path
+import { ChallengeListProvider } from "./context/ChallengeListContext"; // Adjust path
+
+
 // Route configurations
 export const routes = [
   // Guest Routes
@@ -66,10 +71,10 @@ export const routes = [
     allowedRoles: ['admin'],
     children: [
       { path: '/admin/dashboard', element: <AdminDashboard /> },
-      { path: '/admin/users', element: <UserList /> },
+      { path: '/admin/users', element: <UserListProvider><UserList /></UserListProvider> },
       { path: '/admin/users/create', element: <CreateUser /> },
       { path: '/admin/users/:id/edit', element: <UpdateUser /> },
-      { path: '/admin/challenges', element: <ChallengeList /> },
+      { path: '/admin/challenges', element: <ChallengeListProvider><ChallengeList /></ChallengeListProvider> },
       { path: '/admin/challenges/:id', element: <ViewChallenge /> },
       { path: '/admin/challenges/create', element: <CreateChallenge /> },
       { path: '/admin/challenges/:id/edit', element: <UpdateChallenge /> },
@@ -80,9 +85,9 @@ export const routes = [
     element: <StudentLayout />,
     allowedRoles: ['student'],
     children: [
-      { path: '/student/dashboard', element: <div>Student Dashboard</div> },
-      { path: '/student/challenges', element: <StudentChallengeList /> },
-      { path: '/student/challenges/:id', element: <StudentChallengeDetail /> },
+      { path: '/dashboard', element: <div>Student Dashboard</div> },
+      { path: '/progressive', element: <StudentChallengeList /> },
+      { path: '/progressive/:id', element: <StudentChallengeDetail /> },
     ],
   },
   // Professor Routes

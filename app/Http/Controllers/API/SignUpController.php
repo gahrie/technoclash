@@ -4,6 +4,7 @@ namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use App\Models\UserProfile;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
@@ -43,6 +44,7 @@ class SignUpController extends Controller
         $request->validate([
             'email' => 'required|email|exists:users,email',
             'role' => 'required|in:student,professor',
+            'gender' => 'required|in:male,female,others',
             'firstname' => 'required|string|max:255',
             'lastname' => 'required|string|max:255',
             'university' => 'nullable|string|max:255',
@@ -53,10 +55,11 @@ class SignUpController extends Controller
             return response()->json(['message' => 'Invalid signup step'], 400);
         }
 
-        $user->profile()->update([
+        $user->profile()->create([
             'first_name' => ucwords(strtolower($request->firstname)),
             'last_name' => ucwords(strtolower($request->lastname)),
-            'university' => ucwords(strtolower($request->university)),
+            'gender' => $request->gender,
+            'university' => $request->university ? strtoupper($request->university) : null,
         ]);
 
         $code = str_pad(rand(0, 999999), 6, '0', STR_PAD_LEFT);

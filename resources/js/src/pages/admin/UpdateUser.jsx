@@ -1,30 +1,87 @@
-// resources/js/src/components/Admin/UpdateUser.jsx
-import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
-import axios from 'axios';
-import styles from './UpdateUser.module.scss';
+import React, { useState, useEffect } from "react";
+import { useParams, useNavigate, useOutletContext } from "react-router-dom";
+import axios from "axios";
+import {
+    FaEye,
+    FaEyeSlash,
+    FaInfoCircle,
+    FaCheck,
+    FaTimes,
+    FaArrowLeft,
+} from "react-icons/fa";
+import Input from "../../components/ui/Input";
+import CustomSelect from "../../components/ui/CustomSelect";
+import Button from "../../components/ui/Button";
+import Textarea from "../../components/ui/Textarea";
+import UploadInput from "../../components/ui/UploadInput";
+import styles from "./UpdateUser.module.scss";
 
 const UpdateUser = () => {
     const { id } = useParams();
     const navigate = useNavigate();
-    const [firstName, setFirstName] = useState('');
-    const [lastName, setLastName] = useState('');
-    const [username, setUsername] = useState('');
-    const [gender, setGender] = useState('');
-    const [bio, setBio] = useState('');
-    const [university, setUniversity] = useState('');
-    const [email, setEmail] = useState('');
-    const [role, setRole] = useState('');
-    const [password, setPassword] = useState('');
-    const [confirmPassword, setConfirmPassword] = useState('');
-    const [avatar, setAvatar] = useState(null);
-    const [currentAvatar, setCurrentAvatar] = useState(null);
+    const { addNotification } = useOutletContext();
+    const [avatarKey, setAvatarKey] = useState(Date.now());
+    const [firstName, setFirstName] = useState("");
+    const [lastName, setLastName] = useState("");
+    const [username, setUsername] = useState("");
+    const [gender, setGender] = useState("");
+    const [bio, setBio] = useState("");
+    const [university, setUniversity] = useState("");
+    const [email, setEmail] = useState("");
+    const [role, setRole] = useState("");
+    const [password, setPassword] = useState("");
+    const [confirmPassword, setConfirmPassword] = useState("");
+    const [avatarFile, setAvatarFile] = useState(null);
+    const [currentAvatar, setCurrentAvatar] = useState(null); // Store existing avatar URL
+    const [error, setError] = useState({
+        firstName: "",
+        lastName: "",
+        username: "",
+        gender: "",
+        bio: "",
+        university: "",
+        email: "",
+        role: "",
+        password: "",
+        confirmPassword: "",
+        avatar: "",
+        general: "",
+    });
+    const [loading, setLoading] = useState(false);
     const [showPassword, setShowPassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-    const [errors, setErrors] = useState({});
-    const [successMessage, setSuccessMessage] = useState('');
-    const [serverErrors, setServerErrors] = useState({});
-    const [loading, setLoading] = useState(false);
+    const [passwordStrength, setPasswordStrength] = useState({
+        score: 0,
+        color: "",
+        label: "",
+    });
+    const [criteria, setCriteria] = useState({
+        lengthCheck: false,
+        upperCheck: false,
+        lowerCheck: false,
+        numberCheck: false,
+        specialCheck: false,
+    });
+
+    const strengthLevels = [
+        { label: "None", color: "#ccc", score: 0 },
+        { label: "Weak", color: "#FF4D4D", score: 1 },
+        { label: "Fair", color: "#FFA500", score: 2 },
+        { label: "Good", color: "#FFD700", score: 3 },
+        { label: "Strong", color: "#4CAF50", score: 4 },
+    ];
+
+    const genderOptions = [
+        { value: "male", label: "Male" },
+        { value: "female", label: "Female" },
+        { value: "other", label: "Other" },
+    ];
+
+    const roleOptions = [
+        { value: "admin", label: "Admin" },
+        { value: "student", label: "Student" },
+        { value: "professor", label: "Professor" },
+    ];
 
     useEffect(() => {
         const fetchUser = async () => {
@@ -32,28 +89,33 @@ const UpdateUser = () => {
             try {
                 const response = await axios.get(`/api/users/${id}`, {
                     headers: {
-                        Authorization: `Bearer ${localStorage.getItem('token')}`,
+                        Authorization: `Bearer ${localStorage.getItem(
+                            "token"
+                        )}`,
                     },
                 });
                 const user = response.data.data;
-                console.log('Fetched user data:', user); // Debug log
-                setFirstName(user.profile.first_name || '');
-                setLastName(user.profile.last_name || '');
-                setUsername(user.profile.username || '');
-                setGender(user.profile.gender || '');
-                setBio(user.profile.bio || '');
-                setUniversity(user.profile.university || '');
-                setEmail(user.email || '');
-                setRole(user.role || '');
-                setCurrentAvatar(user.profile.avatar ? `/storage/${user.profile.avatar}` : null);
+                setFirstName(user.profile.first_name || "");
+                setLastName(user.profile.last_name || "");
+                setUsername(user.profile.username || "");
+                setGender(user.profile.gender || "");
+                setBio(user.profile.bio || "");
+                setUniversity(user.profile.university || "");
+                setEmail(user.email || "");
+                setRole(user.role || "");
+                setCurrentAvatar(
+                    user.profile.avatar
+                        ? `/storage/${user.profile.avatar}`
+                        : null
+                );
             } catch (error) {
                 if (error.response?.status === 404) {
-                    setServerErrors({ general: 'User not found.' });
+                    addNotification("error", "User not found.");
                 } else if (error.response?.status === 401) {
-                    setServerErrors({ general: 'Unauthorized. Please log in.' });
-                    navigate('/login');
+                    addNotification("error", "Unauthorized. Please log in.");
+                    navigate("/login");
                 } else {
-                    setServerErrors({ general: 'Failed to load user data.' });
+                    addNotification("error", "Failed to load user data.");
                 }
             } finally {
                 setLoading(false);
@@ -62,94 +124,278 @@ const UpdateUser = () => {
         fetchUser();
     }, [id, navigate]);
 
-    const handleAvatarChange = (event) => {
-        const file = event.target.files[0];
-        setAvatar(file);
-        if (file) {
-            setCurrentAvatar(URL.createObjectURL(file));
+    const checkPasswordStrength = (password) => {
+        const lengthCheck = password.length >= 8;
+        const upperCheck = /[A-Z]/.test(password);
+        const lowerCheck = /[a-z]/.test(password);
+        const numberCheck = /\d/.test(password);
+        const specialCheck = /[!@#$%^&*(),_.?":{}|<>]/.test(password);
+
+        const score = [
+            lengthCheck,
+            upperCheck,
+            lowerCheck,
+            numberCheck,
+            specialCheck,
+        ].filter(Boolean).length;
+        setCriteria({
+            lengthCheck,
+            upperCheck,
+            lowerCheck,
+            numberCheck,
+            specialCheck,
+        });
+        const strength =
+            strengthLevels[Math.min(score, 4)] || strengthLevels[0];
+        setPasswordStrength(strength);
+
+        return {
+            lengthCheck,
+            upperCheck,
+            lowerCheck,
+            numberCheck,
+            specialCheck,
+        };
+    };
+
+    const togglePasswordVisibility = () => setShowPassword(!showPassword);
+    const toggleConfirmPasswordVisibility = () =>
+        setShowConfirmPassword(!showConfirmPassword);
+
+    const handleInputChange = (e, field) => {
+        let value = e.target.value;
+        switch (field) {
+            case "firstName":
+            case "lastName":
+                value = value.replace(/[^a-zA-Z'-]/g, "");
+                break;
+            case "username":
+                value = value.replace(/[^a-zA-Z0-9]/g, "");
+                break;
+            case "university":
+                value = value.replace(/[^a-zA-Z\s]/g, "");
+                break;
+            case "email":
+            case "password":
+            case "confirmPassword":
+                value = value.replace(/\s/g, "");
+                break;
+            default:
+                break;
+        }
+        setFormData(field, value);
+        setError({ ...error, [field]: "" });
+        if (field === "password") {
+            checkPasswordStrength(value);
         }
     };
 
-    const handlePasswordToggle = () => {
-        setShowPassword(!showPassword);
+    const setFormData = (field, value) => {
+        switch (field) {
+            case "firstName":
+                setFirstName(value);
+                break;
+            case "lastName":
+                setLastName(value);
+                break;
+            case "username":
+                setUsername(value);
+                break;
+            case "university":
+                setUniversity(value);
+                break;
+            case "email":
+                setEmail(value);
+                break;
+            case "password":
+                setPassword(value);
+                break;
+            case "confirmPassword":
+                setConfirmPassword(value);
+                break;
+            default:
+                break;
+        }
     };
 
-    const handleConfirmPasswordToggle = () => {
-        setShowConfirmPassword(!showConfirmPassword);
+    const resetForm = () => {
+        setPassword("");
+        setConfirmPassword("");
+        setAvatarFile(null);
+        setError({
+            firstName: "",
+            lastName: "",
+            username: "",
+            gender: "",
+            bio: "",
+            university: "",
+            email: "",
+            role: "",
+            password: "",
+            confirmPassword: "",
+            avatar: "",
+            general: "",
+        });
+        checkPasswordStrength("");
+        setAvatarKey(Date.now());
     };
 
     const validateForm = () => {
-        const newErrors = {};
-        if (!firstName) newErrors.firstName = 'First name is required';
-        if (!lastName) newErrors.lastName = 'Last name is required';
-        if (!username) newErrors.username = 'Username is required';
-        if (!gender) newErrors.gender = 'Gender is required';
-        if (!email) newErrors.email = 'Email is required';
-        if (!role) newErrors.role = 'Role is required';
-        if (password && password !== confirmPassword) newErrors.confirmPassword = 'Passwords do not match';
-        setErrors(newErrors);
-        return Object.keys(newErrors).length === 0;
+        const newError = { ...error };
+        let isValid = true;
+
+        if (!firstName) {
+            newError.firstName = "First name is required";
+            isValid = false;
+        }
+        if (!lastName) {
+            newError.lastName = "Last name is required";
+            isValid = false;
+        }
+        if (!username) {
+            newError.username = "Username is required";
+            isValid = false;
+        }
+        if (!gender) {
+            newError.gender = "Gender is required";
+            isValid = false;
+        }
+        if (!email) {
+            newError.email = "Email is required";
+            isValid = false;
+        }
+        if (!role) {
+            newError.role = "Role is required";
+            isValid = false;
+        }
+        if (password && password !== confirmPassword) {
+            newError.confirmPassword = "Passwords do not match";
+            isValid = false;
+        }
+        if (avatarFile && !avatarFile.type.startsWith("image/")) {
+            newError.avatar = "Please upload a valid image file";
+            isValid = false;
+        }
+        if (password) {
+            const {
+                lengthCheck,
+                upperCheck,
+                lowerCheck,
+                numberCheck,
+                specialCheck,
+            } = checkPasswordStrength(password);
+            if (
+                !(
+                    lengthCheck &&
+                    upperCheck &&
+                    lowerCheck &&
+                    numberCheck &&
+                    specialCheck
+                )
+            ) {
+                newError.password =
+                    "Password must meet all criteria (see tooltip)";
+                isValid = false;
+            }
+        }
+
+        setError(newError);
+        return isValid;
     };
 
     const handleSubmit = async (event) => {
         event.preventDefault();
-        if (!validateForm()) return;
+        setError({
+            firstName: "",
+            lastName: "",
+            username: "",
+            gender: "",
+            bio: "",
+            university: "",
+            email: "",
+            role: "",
+            password: "",
+            confirmPassword: "",
+            avatar: "",
+            general: "",
+        });
+        setLoading(true);
+
+        if (!validateForm()) {
+            setLoading(false);
+            addNotification("error", "Please fix the errors in the form.");
+            return;
+        }
 
         const formData = new FormData();
-        if (avatar) formData.append('avatar', avatar);
-        formData.append('first_name', firstName);
-        formData.append('last_name', lastName);
-        formData.append('username', username);
-        formData.append('gender', gender);
-        formData.append('bio', bio || ''); // Ensure empty string if null
-        formData.append('university', university || '');
-        formData.append('email', email);
-        formData.append('role', role);
+        if (avatarFile) formData.append("avatar", avatarFile); // Only append if new avatar is selected
+        formData.append("first_name", firstName);
+        formData.append("last_name", lastName);
+        formData.append("username", username);
+        formData.append("gender", gender);
+        formData.append("bio", bio || "");
+        formData.append("university", university || "");
+        formData.append("email", email);
+        formData.append("role", role);
         if (password) {
-            formData.append('password', password);
-            formData.append('confirm_password', confirmPassword);
+            formData.append("password", password);
+            formData.append("password_confirmation", confirmPassword);
         }
-        formData.append('_method', 'PUT');
-
-        // Debug: Log FormData contents
-        const formDataEntries = {};
-        for (let [key, value] of formData.entries()) {
-            formDataEntries[key] = value;
-        }
-        console.log('FormData being sent:', formDataEntries);
+        formData.append("_method", "PUT");
 
         try {
-            setLoading(true);
-            await axios.get('/sanctum/csrf-cookie');
-            const response = await axios.post(`/api/users/${id}`, formData, {
+            await axios.get("/sanctum/csrf-cookie");
+            await axios.post(`/api/users/${id}`, formData, {
                 headers: {
-                    'Content-Type': 'multipart/form-data',
-                    Authorization: `Bearer ${localStorage.getItem('token')}`,
+                    "Content-Type": "multipart/form-data",
+                    Authorization: `Bearer ${localStorage.getItem("token")}`,
                 },
             });
 
-            setSuccessMessage('User updated successfully!');
-            setServerErrors({});
-            setErrors({});
-            setPassword('');
-            setConfirmPassword('');
-            setAvatar(null);
-            setTimeout(() => navigate('/admin/users'), 2000);
+            addNotification("success", "User updated successfully!");
         } catch (error) {
             if (error.response) {
                 if (error.response.status === 422) {
-                    setServerErrors(error.response.data.errors);
-                    setSuccessMessage('');
-                } else if (error.response.status === 401 || error.response.status === 403) {
-                    setServerErrors({ general: 'You are not authorized to perform this action.' });
-                    setSuccessMessage('');
+                    const validationErrors = error.response.data.errors;
+                    const newError = {
+                        firstName: validationErrors.first_name?.[0] || "",
+                        lastName: validationErrors.last_name?.[0] || "",
+                        username: validationErrors.username?.[0] || "",
+                        gender: validationErrors.gender?.[0] || "",
+                        bio: validationErrors.bio?.[0] || "",
+                        university: validationErrors.university?.[0] || "",
+                        email: validationErrors.email?.[0] || "",
+                        role: validationErrors.role?.[0] || "",
+                        password: validationErrors.password?.[0] || "",
+                        confirmPassword:
+                            validationErrors.password_confirmation?.[0] || "",
+                        avatar: validationErrors.avatar?.[0] || "",
+                        general: "",
+                    };
+                    setError(newError);
+                    addNotification(
+                        "error",
+                        "Please fix the errors in the form."
+                    );
+                } else if (
+                    error.response.status === 401 ||
+                    error.response.status === 403
+                ) {
+                    addNotification(
+                        "error",
+                        "You are not authorized to perform this action."
+                    );
                 } else {
-                    setServerErrors({ general: 'An error occurred. Please try again: ' + error.message });
-                    setSuccessMessage('');
+                    addNotification(
+                        "error",
+                        "An error occurred. Please try again."
+                    );
                 }
             } else {
-                setServerErrors({ general: 'Network error. Please check your connection.' });
-                setSuccessMessage('');
+                addNotification(
+                    "error",
+                    "Network error. Please check your connection."
+                );
             }
         } finally {
             setLoading(false);
@@ -158,124 +404,141 @@ const UpdateUser = () => {
 
     return (
         <div className={styles.container}>
-            {loading && <div className={styles.loading}>Loading...</div>}
+            <div className={styles.navigation}>
+                <Button variant="secondary-form" to="/admin/users">
+                    <FaArrowLeft /> Back
+                </Button>
+            </div>
+            {loading && (
+                <div className={styles.spinnerContainer}>
+                    <div className={styles.spinner}></div>
+                </div>
+            )}
             <form onSubmit={handleSubmit} className={styles.formContainer}>
                 <div className={styles.card}>
-                    {successMessage && <div className={styles.success}>{successMessage}</div>}
-                    {serverErrors.general && <div className={styles.error}>{serverErrors.general}</div>}
+                    {error.general && (
+                        <div className={styles.error}>{error.general}</div>
+                    )}
                     <div className={styles.section}>
                         <h2 className={styles.sectionTitle}>Information</h2>
-                        <div className={styles.inputGroup}>
-                            <label htmlFor="avatar">Avatar</label>
-                            {currentAvatar && (
-                                <div className={styles.avatarPreview}>
-                                    <img src={currentAvatar} alt="Avatar Preview" />
-                                </div>
-                            )}
-                            <input
+                        <div className={styles.row}>
+                            <UploadInput
+                                key={avatarKey}
                                 id="avatar"
-                                type="file"
+                                onChange={(file) => {
+                                    setAvatarFile(file);
+                                    setError({ ...error, avatar: "" });
+                                }}
                                 accept="image/*"
-                                onChange={handleAvatarChange}
-                                className={styles.input}
+                                type="avatar"
+                                placeholder="Upload Avatar (Optional)"
+                                initialPreview={currentAvatar} // Pass existing avatar
                             />
-                            {serverErrors.avatar && <span className={styles.error}>{serverErrors.avatar[0]}</span>}
-                        </div>
-                        <div className={styles.row}>
-                            <div className={styles.inputGroup}>
-                                <label htmlFor="firstName">First Name</label>
-                                <input
-                                    id="firstName"
-                                    type="text"
-                                    value={firstName}
-                                    onChange={(e) => setFirstName(e.target.value)}
-                                    className={`${styles.input} ${errors.firstName ? styles.inputError : ''} ${
-                                        firstName ? styles.inputFilled : ''
-                                    }`}
-                                    required
-                                />
-                                {errors.firstName && <span className={styles.error}>{errors.firstName}</span>}
-                                {serverErrors.first_name && (
-                                    <span className={styles.error}>{serverErrors.first_name[0]}</span>
-                                )}
-                            </div>
-                            <div className={styles.inputGroup}>
-                                <label htmlFor="lastName">Last Name</label>
-                                <input
-                                    id="lastName"
-                                    type="text"
-                                    value={lastName}
-                                    onChange={(e) => setLastName(e.target.value)}
-                                    className={`${styles.input} ${errors.lastName ? styles.inputError : ''} ${
-                                        lastName ? styles.inputFilled : ''
-                                    }`}
-                                    required
-                                />
-                                {errors.lastName && <span className={styles.error}>{errors.lastName}</span>}
-                                {serverErrors.last_name && (
-                                    <span className={styles.error}>{serverErrors.last_name[0]}</span>
-                                )}
-                            </div>
-                        </div>
-                        <div className={styles.row}>
-                            <div className={styles.inputGroup}>
-                                <label htmlFor="username">Username</label>
-                                <input
-                                    id="username"
-                                    type="text"
-                                    value={username}
-                                    onChange={(e) => setUsername(e.target.value)}
-                                    className={`${styles.input} ${errors.username ? styles.inputError : ''} ${
-                                        username ? styles.inputFilled : ''
-                                    }`}
-                                    required
-                                />
-                                {errors.username && <span className={styles.error}>{errors.username}</span>}
-                                {serverErrors.username && (
-                                    <span className={styles.error}>{serverErrors.username[0]}</span>
-                                )}
-                            </div>
-                            <div className={styles.inputGroup}>
-                                <label htmlFor="gender">Gender</label>
-                                <select
-                                    id="gender"
-                                    value={gender}
-                                    onChange={(e) => setGender(e.target.value)}
-                                    className={`${styles.input} ${errors.gender ? styles.inputError : ''} ${
-                                        gender ? styles.inputFilled : ''
-                                    }`}
-                                    required
-                                >
-                                    <option value="">Select gender</option>
-                                    <option value="male">Male</option>
-                                    <option value="female">Female</option>
-                                    <option value="other">Other</option>
-                                </select>
-                                {errors.gender && <span className={styles.error}>{errors.gender}</span>}
-                                {serverErrors.gender && <span className={styles.error}>{serverErrors.gender[0]}</span>}
+                            {error.avatar && (
+                                <p className={styles.error}>{error.avatar}</p>
+                            )}
+                            <div className={styles.col}>
+                                <div className={styles.inputGroup}>
+                                    <Input
+                                        id="firstName"
+                                        type="text"
+                                        value={firstName}
+                                        onChange={(e) =>
+                                            handleInputChange(e, "firstName")
+                                        }
+                                        placeholder="First Name"
+                                        required
+                                    />
+                                    {error.firstName && (
+                                        <p className={styles.error}>
+                                            {error.firstName}
+                                        </p>
+                                    )}
+                                </div>
+                                <div className={styles.inputGroup}>
+                                    <Input
+                                        id="lastName"
+                                        type="text"
+                                        value={lastName}
+                                        onChange={(e) =>
+                                            handleInputChange(e, "lastName")
+                                        }
+                                        placeholder="Last Name"
+                                        required
+                                    />
+                                    {error.lastName && (
+                                        <p className={styles.error}>
+                                            {error.lastName}
+                                        </p>
+                                    )}
+                                </div>
+                                <div className={styles.inputGroup}>
+                                    <Input
+                                        id="username"
+                                        type="text"
+                                        value={username}
+                                        onChange={(e) =>
+                                            handleInputChange(e, "username")
+                                        }
+                                        placeholder="Username"
+                                        required
+                                    />
+                                    {error.username && (
+                                        <p className={styles.error}>
+                                            {error.username}
+                                        </p>
+                                    )}
+                                </div>
+                                <div className={styles.inputGroup}>
+                                    <CustomSelect
+                                        id="gender"
+                                        value={gender}
+                                        onChange={(value) => {
+                                            setGender(value);
+                                            setError({ ...error, gender: "" });
+                                        }}
+                                        options={genderOptions}
+                                        placeholder="Gender"
+                                        required
+                                        error={error.gender}
+                                        enableSearch={false}
+                                    />
+                                    {error.gender && (
+                                        <p className={styles.error}>
+                                            {error.gender}
+                                        </p>
+                                    )}
+                                </div>
                             </div>
                         </div>
                         <div className={styles.inputGroup}>
-                            <label htmlFor="bio">Bio</label>
-                            <textarea
+                            <Textarea
                                 id="bio"
                                 value={bio}
-                                onChange={(e) => setBio(e.target.value)}
-                                className={`${styles.input} ${bio ? styles.inputFilled : ''}`}
+                                onChange={(e) => {
+                                    setBio(e.target.value);
+                                    setError({ ...error, bio: "" });
+                                }}
+                                placeholder="Bio"
                             />
-                            {serverErrors.bio && <span className={styles.error}>{serverErrors.bio[0]}</span>}
+                            {error.bio && (
+                                <p className={styles.error}>{error.bio}</p>
+                            )}
                         </div>
                         <div className={styles.inputGroup}>
-                            <label htmlFor="university">University</label>
-                            <input
+                            <Input
                                 id="university"
                                 type="text"
                                 value={university}
-                                onChange={(e) => setUniversity(e.target.value)}
-                                className={`${styles.input} ${university ? styles.inputFilled : ''}`}
+                                onChange={(e) =>
+                                    handleInputChange(e, "university")
+                                }
+                                placeholder="University (Optional)"
                             />
-                            {serverErrors.university && (
-                                <span className={styles.error}>{serverErrors.university[0]}</span>
+                            {error.university && (
+                                <p className={styles.error}>
+                                    {error.university}
+                                </p>
                             )}
                         </div>
                     </div>
@@ -283,95 +546,237 @@ const UpdateUser = () => {
                     <div className={styles.section}>
                         <h2 className={styles.sectionTitle}>Credentials</h2>
                         <div className={styles.inputGroup}>
-                            <label htmlFor="email">Email</label>
-                            <input
+                            <Input
                                 id="email"
                                 type="email"
                                 value={email}
-                                onChange={(e) => setEmail(e.target.value)}
-                                className={`${styles.input} ${errors.email ? styles.inputError : ''} ${
-                                    email ? styles.inputFilled : ''
-                                }`}
+                                onChange={(e) => handleInputChange(e, "email")}
+                                placeholder="Email"
                                 required
                             />
-                            {errors.email && <span className={styles.error}>{errors.email}</span>}
-                            {serverErrors.email && <span className={styles.error}>{serverErrors.email[0]}</span>}
-                        </div>
-                        <div className={styles.inputGroup}>
-                            <label htmlFor="role">Role</label>
-                            <select
-                                id="role"
-                                value={role}
-                                onChange={(e) => setRole(e.target.value)}
-                                className={`${styles.input} ${errors.role ? styles.inputError : ''} ${
-                                    role ? styles.inputFilled : ''
-                                }`}
-                                required
-                            >
-                                <option value="">Select a role</option>
-                                <option value="admin">Admin</option>
-                                <option value="user">User</option>
-                                <option value="moderator">Moderator</option>
-                            </select>
-                            {errors.role && <span className={styles.error}>{errors.role}</span>}
-                            {serverErrors.role && <span className={styles.error}>{serverErrors.role[0]}</span>}
-                        </div>
-                        <div className={styles.inputGroup}>
-                            <label htmlFor="password">Password (Leave blank to keep unchanged)</label>
-                            <div className={styles.passwordWrapper}>
-                                <input
-                                    id="password"
-                                    type={showPassword ? 'text' : 'password'}
-                                    value={password}
-                                    onChange={(e) => setPassword(e.target.value)}
-                                    className={`${styles.input} ${errors.password ? styles.inputError : ''} ${
-                                        password ? styles.inputFilled : ''
-                                    }`}
-                                />
-                                <button
-                                    type="button"
-                                    onClick={handlePasswordToggle}
-                                    className={styles.passwordToggle}
-                                >
-                                    {showPassword ? 'Hide' : 'Show'}
-                                </button>
-                            </div>
-                            {errors.password && <span className={styles.error}>{errors.password}</span>}
-                            {serverErrors.password && (
-                                <span className={styles.error}>{serverErrors.password[0]}</span>
+                            {error.email && (
+                                <p className={styles.error}>{error.email}</p>
                             )}
                         </div>
                         <div className={styles.inputGroup}>
-                            <label htmlFor="confirmPassword">Confirm Password</label>
-                            <div className={styles.passwordWrapper}>
-                                <input
-                                    id="confirmPassword"
-                                    type={showConfirmPassword ? 'text' : 'password'}
-                                    value={confirmPassword}
-                                    onChange={(e) => setConfirmPassword(e.target.value)}
-                                    className={`${styles.input} ${
-                                        errors.confirmPassword ? styles.inputError : ''
-                                    } ${confirmPassword ? styles.inputFilled : ''}`}
+                            <CustomSelect
+                                id="role"
+                                value={role}
+                                onChange={(value) => {
+                                    setRole(value);
+                                    setError({ ...error, role: "" });
+                                }}
+                                options={roleOptions}
+                                placeholder="Role"
+                                required
+                                error={error.role}
+                                enableSearch={false}
+                            />
+                            {error.role && (
+                                <p className={styles.error}>{error.role}</p>
+                            )}
+                        </div>
+                        <div className={styles.inputGroup}>
+                            <div className={styles["password-wrapper"]}>
+                                <Input
+                                    id="password"
+                                    type={showPassword ? "text" : "password"}
+                                    value={password}
+                                    onChange={(e) =>
+                                        handleInputChange(e, "password")
+                                    }
+                                    className={styles.password}
+                                    placeholder="Password (Leave blank to keep unchanged)"
                                 />
-                                <button
-                                    type="button"
-                                    onClick={handleConfirmPasswordToggle}
-                                    className={styles.passwordToggle}
-                                >
-                                    {showConfirmPassword ? 'Hide' : 'Show'}
-                                </button>
+                                <div className={styles.icons}>
+                                    <span
+                                        className={styles["toggle-icon"]}
+                                        onClick={togglePasswordVisibility}
+                                    >
+                                        {showPassword ? (
+                                            <FaEyeSlash />
+                                        ) : (
+                                            <FaEye />
+                                        )}
+                                    </span>
+                                    <span className={styles["info-icon"]}>
+                                        <FaInfoCircle />
+                                        <div
+                                            className={
+                                                styles["tooltip-content"]
+                                            }
+                                        >
+                                            <ul>
+                                                <li>
+                                                    {criteria.lengthCheck ? (
+                                                        <FaCheck
+                                                            className={
+                                                                styles[
+                                                                    "check-icon"
+                                                                ]
+                                                            }
+                                                        />
+                                                    ) : (
+                                                        <FaTimes
+                                                            className={
+                                                                styles[
+                                                                    "times-icon"
+                                                                ]
+                                                            }
+                                                        />
+                                                    )}
+                                                    At least 8 characters
+                                                </li>
+                                                <li>
+                                                    {criteria.upperCheck ? (
+                                                        <FaCheck
+                                                            className={
+                                                                styles[
+                                                                    "check-icon"
+                                                                ]
+                                                            }
+                                                        />
+                                                    ) : (
+                                                        <FaTimes
+                                                            className={
+                                                                styles[
+                                                                    "times-icon"
+                                                                ]
+                                                            }
+                                                        />
+                                                    )}
+                                                    1 uppercase letter
+                                                </li>
+                                                <li>
+                                                    {criteria.lowerCheck ? (
+                                                        <FaCheck
+                                                            className={
+                                                                styles[
+                                                                    "check-icon"
+                                                                ]
+                                                            }
+                                                        />
+                                                    ) : (
+                                                        <FaTimes
+                                                            className={
+                                                                styles[
+                                                                    "times-icon"
+                                                                ]
+                                                            }
+                                                        />
+                                                    )}
+                                                    1 lowercase letter
+                                                </li>
+                                                <li>
+                                                    {criteria.numberCheck ? (
+                                                        <FaCheck
+                                                            className={
+                                                                styles[
+                                                                    "check-icon"
+                                                                ]
+                                                            }
+                                                        />
+                                                    ) : (
+                                                        <FaTimes
+                                                            className={
+                                                                styles[
+                                                                    "times-icon"
+                                                                ]
+                                                            }
+                                                        />
+                                                    )}
+                                                    1 number
+                                                </li>
+                                                <li>
+                                                    {criteria.specialCheck ? (
+                                                        <FaCheck
+                                                            className={
+                                                                styles[
+                                                                    "check-icon"
+                                                                ]
+                                                            }
+                                                        />
+                                                    ) : (
+                                                        <FaTimes
+                                                            className={
+                                                                styles[
+                                                                    "times-icon"
+                                                                ]
+                                                            }
+                                                        />
+                                                    )}
+                                                    1 special character
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </span>
+                                </div>
                             </div>
-                            {errors.confirmPassword && <span className={styles.error}>{errors.confirmPassword}</span>}
-                            {serverErrors.confirm_password && (
-                                <span className={styles.error}>{serverErrors.confirm_password[0]}</span>
+                            <div className={styles["password-strength"]}>
+                                <label>
+                                    Password Strength:
+                                    <span
+                                        className={styles["strength-label"]}
+                                        style={{
+                                            color: passwordStrength.color,
+                                            marginLeft: "5px",
+                                        }}
+                                    >
+                                        {passwordStrength.label || "None"}
+                                    </span>
+                                </label>
+                            </div>
+                            {error.password && (
+                                <p className={styles.error}>{error.password}</p>
+                            )}
+                        </div>
+                        <div className={styles.inputGroup}>
+                            <div className={styles["password-wrapper"]}>
+                                <Input
+                                    id="confirmPassword"
+                                    type={
+                                        showConfirmPassword
+                                            ? "text"
+                                            : "password"
+                                    }
+                                    value={confirmPassword}
+                                    onChange={(e) =>
+                                        handleInputChange(e, "confirmPassword")
+                                    }
+                                    className={styles.confirmPassword}
+                                    placeholder="Confirm Password"
+                                />
+                                <div className={styles.icons}>
+                                    <span
+                                        className={styles["toggle-icon"]}
+                                        onClick={
+                                            toggleConfirmPasswordVisibility
+                                        }
+                                    >
+                                        {showConfirmPassword ? (
+                                            <FaEyeSlash />
+                                        ) : (
+                                            <FaEye />
+                                        )}
+                                    </span>
+                                </div>
+                            </div>
+                            {error.confirmPassword && (
+                                <p className={styles.error}>
+                                    {error.confirmPassword}
+                                </p>
                             )}
                         </div>
                     </div>
 
                     <div className={styles.actions}>
-                        <button type="submit" className={styles.submitButton} disabled={loading}>
-                            {loading ? 'Updating...' : 'Update User'}
-                        </button>
+                        <Button
+                            variant="secondary-form"
+                            type="submit"
+                            loading={loading}
+                        >
+                            Update User
+                        </Button>
                     </div>
                 </div>
             </form>

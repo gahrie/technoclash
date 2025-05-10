@@ -43,6 +43,12 @@ const SignUpVerifyEmail = () => {
     }
   };
 
+  const handleSignInClick = () => {
+    localStorage.removeItem('signup_email');
+    localStorage.removeItem('registration_progress');
+  };
+
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError({ code: '', general: '' });
@@ -127,7 +133,7 @@ const SignUpVerifyEmail = () => {
             </div>
             {error.code && <p className={styles.error}>{error.code}</p>}
           </div>
-          <Button variant='secondary' type="submit" loading={loading}>
+          <Button variant='form' type="submit" loading={loading}>
             Verify
           </Button>
         </form>
@@ -136,6 +142,9 @@ const SignUpVerifyEmail = () => {
           <CustomLink to="#" onClick={handleResend} disabled={loading}>
             Resend
           </CustomLink>
+        </p>
+        <p>
+            Already have an account? <CustomLink to="/login" onClick={handleSignInClick}>Sign in</CustomLink>
         </p>
       </div>
       {showModal && (

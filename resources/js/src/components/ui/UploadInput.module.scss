@@ -1,0 +1,128 @@
+@import "../../../../sass/variables";
+@import "../../../../sass/global.scss";
+
+.uploadContainer {
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    justify-content: center;
+    max-width: 200px;
+    padding: 0 50px;
+}
+
+.uploadLabel {
+    display: flex;
+    align-items: center;
+    border-radius: 4px;
+    overflow: hidden;
+    background-color: var(--secondary-bg);
+    cursor: pointer;
+    flex: 1;
+}
+
+.uploadInput {
+    display: none;
+}
+
+.uploadText {
+    flex: 1;
+    padding: 10px;
+    color: var(--text);
+    font-size: 14px;
+    opacity: 0.6;
+}
+
+.uploadButton {
+    padding: 10px;
+    background-color: $primary;
+    color: #fff;
+    font-size: 14px;
+    transition: $transition;
+    &:hover {
+        background-color: $primary-hover;
+    }
+}
+
+.avatarPreview {
+    display: flex;
+    align-items: center;
+}
+
+.previewImage,
+.defaultAvatar {
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    object-fit: contain;
+    border: 2px solid var(--border);
+    background-color: var(--secondary-bg);
+}
+
+.defaultAvatar {
+    color: var(--text);
+    opacity: 0.6;
+}
+
+.error {
+    color: $error;
+    font-size: 0.875rem;
+    margin-top: 5px;
+    flex-basis: 100%;
+}
+
+.cropModal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
+
+.cropModalContent {
+    background-color: var(--secondary-bg);
+    padding: 20px;
+    border-radius: 8px;
+    max-width: 500px;
+    width: 90%;
+    text-align: center;
+}
+
+.cropButtons {
+    margin-top: 15px;
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+}
+
+.cropConfirm,
+.cropCancel {
+    padding: 8px 16px;
+    border-radius: 4px;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+.cropConfirm {
+    background-color: $primary;
+    color: #fff;
+    border: none;
+
+    &:hover {
+        background-color: darken($primary, 10%);
+    }
+}
+
+.cropCancel {
+    background-color: transparent;
+    border: 1px solid var(--border);
+    color: var(--text);
+
+    &:hover {
+        background-color: var(--border);
+    }
+}

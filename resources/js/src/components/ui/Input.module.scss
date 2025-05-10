@@ -1,58 +1,55 @@
-@import '../../../../sass/variables';
+@use "../../../../sass/variables" as *;
+@use "../../../../sass/global.scss" as *;
 
 .ui-input-container {
-  position: relative;
-  flex: 1;
+    position: relative;
+    width: 100%;
 }
 
-
 .ui-input {
-  width: 100%;
-  padding: 10px;
-  border: 2px solid $line;
-  border-radius: 4px;
-  transition: border-color 0.3s ease-in-out;
-  background: transparent;
-  font-size: 16px;
-  &:focus {
-    outline: none;
-    border-color: $primary;
-  }
+    width: 100%;
+    padding: 10px;
+    border: 2px solid var(--border);
+    border-radius: 4px;
+    background-color: var(--secondary-bg);
+    color: var(--text);
+    transition: border-color 0.3s ease-in-out;
+    font-size: 14px;
+    &:focus {
+        outline: none;
+        border-color: $primary;
+    }
 
-  &--filled {
-    border-color: $primary;
-  }
+    &--error {
+        border-color: $error;
+    }
 
-  &--error {
-    border-color: $error;
-  }
-
-  &:focus + .ui-input-span,
-  &--filled + .ui-input-span {
-    font-size: 12px;
-    font-weight: bold;
-    color: $gray;
-    background: $white;
-    padding: 0 5px;
-    left: 5px;
-    top: 0;
-  }
+    &:focus + .ui-input-span,
+    &--filled + .ui-input-span {
+        color: $primary;
+        background-color: var(--secondary-bg);
+        font-size: 10px;
+        font-weight: bold;
+        padding: 0 5px;
+        left: 5px;
+        top: 0;
+    }
 }
 
 .ui-input-span {
-  position: absolute;
-  top: 50%;
-  left: 10px;
-  transform: translateY(-50%);
-  color: $gray;
-  font-size: 16px;
-  pointer-events: none;
-  transition: all 0.2s ease-in-out;
+    position: absolute;
+    top: 50%;
+    left: 10px;
+    transform: translateY(-50%);
+    color: var(--placeholder);
+    font-size: 14px;
+    pointer-events: none;
+    transition: all 0.2s ease-in-out;
 }
 
 .ui-input--no-float {
-  padding: 10px;
-  height: 100px;
-  font-size: 48px;
-  text-align: center;
+    padding: 10px;
+    height: 100px;
+    font-size: 48px;
+    text-align: center;
 }

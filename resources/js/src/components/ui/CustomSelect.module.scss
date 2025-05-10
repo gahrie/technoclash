@@ -1,0 +1,249 @@
+@import "../../../../sass/variables";
+@import "../../../../sass/global.scss";
+
+.select-container {
+    position: relative;
+    width: 100%;
+    font-family: inherit;
+    color: var(--text);
+
+    &.small {
+        min-width: 80px;
+        font-size: 0.9rem;
+
+        .select-input {
+            padding: 0.3rem;
+        }
+
+        .select-input-field {
+            font-size: 0.9rem;
+        }
+
+        .select-arrow svg {
+            width: 14px;
+            height: 14px;
+        }
+    }
+
+    &.loading {
+        .select-input {
+            cursor: wait;
+        }
+    }
+
+    &.has-error {
+        .select-input {
+            border-color: $error;
+        }
+    }
+}
+
+.select-wrapper {
+    position: relative;
+}
+
+.select-input {
+    display: flex;
+    align-items: center;
+    background-color: var(--secondary-bg);
+    border: 2px solid var(--border);
+    border-radius: 4px;
+    padding: 10px;
+    height: 40px;
+    cursor: pointer;
+    transition: border-color 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+
+    &:hover {
+        border-color: $primary;
+    }
+
+    &:focus-within {
+        border-color: $primary;
+        box-shadow: 0 0 0 2px rgba($primary, 0.2);
+    }
+}
+
+.select-tags {
+    display: flex;
+    gap: 0.25rem;
+    flex: 1;
+}
+
+.select-tag {
+    display: flex;
+    align-items: center;
+    border: 1px solid $primary;
+    color: var(--text);
+    padding: 0 0 0 5px;
+    border-radius: 2px;
+    font-size: 14px;
+}
+
+.select-tag-remove {
+    background: $primary;
+    border: none;
+    color: #fff;
+    margin-left: 0.25rem;
+    padding: 3px 5px 3px;
+    cursor: pointer;
+    font-size: 14px;
+    line-height: 1;
+
+    &:hover {
+        color: #ddd;
+    }
+}
+
+.select-input-field {
+    flex: 1;
+    border: none;
+    background: transparent;
+    color: var(--text);
+    font-size: 14px;
+    outline: none;
+    width: 100%;
+    min-width: 100px;
+
+    &:read-only {
+        cursor: pointer;
+    }
+
+    &::placeholder {
+        color: var(--placeholder);
+        opacity: 0.6;
+    }
+
+    &--filled + .select-span,
+    &:focus + .select-span {
+        color: $primary;
+        font-size: 10px;
+        font-weight: bold;
+        background-color: var(--secondary-bg);
+        padding: 0 5px;
+        left: 5px;
+        top: 0;
+    }
+}
+
+.select-span {
+    position: absolute;
+    top: 50%;
+    left: 10px;
+    transform: translateY(-50%);
+    color: var(--placeholder);
+    font-size: 14px;
+    pointer-events: none;
+    transition: all 0.2s ease-in-out;
+}
+
+.select-arrow {
+    color: var(--text);
+    font-size: 1rem;
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    right: 10px;
+}
+
+.loader {
+    border: 2px solid var(--text);
+    border-top: 2px solid $primary;
+    border-radius: 50%;
+    width: 12px;
+    height: 12px;
+    animation: spin 1s linear infinite;
+}
+
+.select-options {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    max-height: 200px;
+    overflow-y: auto;
+    background-color: var(--secondary-bg);
+    border: 2px solid var(--border);
+    border-top: 0;
+    border-radius: 0 0 4px 4px;
+    padding: 0;
+    list-style: none;
+    box-shadow: $shadow;
+    z-index: 1000;
+    animation: slideIn 0.2s ease-out;
+
+    &::-webkit-scrollbar {
+        width: 6px;
+    }
+
+    &::-webkit-scrollbar-thumb {
+        background: $primary;
+        border-radius: 3px;
+    }
+}
+
+.select-option {
+    padding: 0.5rem 1rem;
+    cursor: pointer;
+    color: var(--text);
+    transition: background-color 0.2s ease, color 0.2s ease;
+
+    &:hover {
+        background-color: $primary;
+        color: #fff;
+    }
+
+    &-highlighted {
+        background-color: rgba($primary, 0.1);
+    }
+
+    &-selected {
+        font-weight: 600;
+        color: $primary;
+    }
+
+    &-disabled {
+        cursor: not-allowed;
+        color: var(--text);
+        opacity: 0.5;
+        font-weight: bold;
+        background-color: transparent;
+
+        &:hover {
+            background-color: transparent;
+            color: var(--text);
+        }
+    }
+}
+
+.select-option-empty {
+    padding: 0.5rem 1rem;
+    color: var(--text);
+    opacity: 0.6;
+    text-align: center;
+}
+
+.select-error {
+    color: $error;
+    font-size: 0.875rem;
+    margin-top: 5px;
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
+}

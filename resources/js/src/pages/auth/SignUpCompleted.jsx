@@ -15,7 +15,7 @@ const SignUpCompleted = () => {
     return () => clearTimeout(timer);
   }, [navigate]);
 
-  const handleLoginClick = () => {
+  const handleLoginClick = () => {2
     navigate('/login');
   };
 
@@ -27,7 +27,7 @@ const SignUpCompleted = () => {
           <p>Congratulations! Your account has been successfully created.</p>
           <p>You’ll be redirected to the login page in a few seconds, or click below to go there now.</p>
         </div>
-        <Button variant='secondary' onClick={handleLoginClick}>Go to Login</Button>
+        <Button variant='form' onClick={handleLoginClick}>Go to Login</Button>
       </div>
     </div>
   );

@@ -1,304 +1,201 @@
-@import '../../../sass/variables';
-
+@import "../../../sass/variables";
+@import "../../../sass/global.scss";
 .sidebar {
-  position: sticky;
-  top: 0;
-  left: 0;
-  width: 300px;
-  height: 100vh;
-  padding: 0 5px;
-  background-color: $white;
-  border-right: 1px solid #ccc;
-  overflow: hidden;
-  transition: all 0.3s ease-in-out;
-  display: flex;
-  flex-direction: column;
-
-  &.close {
+    position: sticky;
+    top: 0;
+    left: 0;
+    height: 100vh;
     padding: 0 5px;
-    width: 60px;
-    min-width: 0;
-
-    .label,
-    .subMenuLink,
-    .userInfo,
-    .arrow,
-    .userArrow {
-      opacity: 0;
-      transform: translateX(-10px); /* Slide text and arrows left when closing */
+    overflow: hidden;
+    display: flex;
+    background-color: var(--secondary-bg);
+    flex-direction: column;
+    transition: width 0.3s ease-in-out, padding 0.3s ease-in-out;
+    box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
+    &.open {
+        width: 300px;
     }
 
-    .icon,
-    .userIcon {
-      margin-right: 20px; /* Remove margin to prevent centering */
-    }
+    &.close {
+        width: 60px;
+        padding: 0 5px;
+        .label,
+        .subMenuLink,
+        .userInfo,
+        .arrow,
+        .userArrow {
+            opacity: 0;
+            transform: translateX(-10px);
+        }
 
-    .sidebarLink,
-    .dropdownBtn,
-    .userBtn {
-      justify-content: flex-start; /* Align icon to left */
-    }
+        .icon,
+        .userIcon {
+            margin-right: 20px;
+        }
 
-    .toggleBtn {
-      justify-content: flex-start; /* Align toggle icon to left */
+        .sidebarLink,
+        .dropdownBtn,
+        .userBtn {
+            justify-content: flex-start;
+        }
+
+        .toggleBtn {
+            justify-content: flex-start;
+        }
     }
-  }
 }
 
 .sidebarList {
-  list-style: none;
-  padding: 0;
-  flex-grow: 1;
-  overflow-y: auto;
+    list-style: none;
+    padding: 0;
+    flex-grow: 1;
+    overflow-y: auto;
 }
 
 .sidebarItem {
-  margin: 10px 0;
-  white-space: nowrap;
-  overflow: hidden;
+    white-space: nowrap;
+    overflow: hidden;
+    padding: 0 3px 10px;
 }
 
 .toggleItem {
-  display: flex;
-  justify-content: flex-end;
-  margin-bottom: 16px;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    margin: 10px 0;
 
-  .toggleBtn {
-    background-color: $white;
-    border: none;
-    cursor: pointer;
-    color: $black;
-    padding: 0.5em;
-    margin-right: 3px;
-    width: 50px;
-    font-size: 24px;
-    transition: all 0.15s ease-in-out;
+    .toggleBtn {
+        background-color: transparent;
+        border: none;
+        cursor: pointer;
+        color: var(--text);
+        padding: 0.5em;
+        margin-right: 3px;
+        width: 50px;
+        font-size: 24px;
+        transition: all 0.15s ease-in-out;
 
-    &:hover {
-      color: $primary;
-      background-color: transparent;
+        &:hover {
+            color: $primary;
+
+            background-color: transparent;
+        }
     }
-  }
 }
 
 .sidebarLink {
-  border-radius: 0.5em;
-  padding: 0.5em;
-  text-decoration: none;
-  color: $black;
-  display: flex;
-  align-items: center;
-  transition: color 0.15s ease-in-out;
-
-  &:hover {
-    color: $primary;
-    text-decoration: none;
-  }
-
-  &.active {
-    color: $black;
-    border-right: 4px solid $primary;
-    border-bottom: 1px solid $primary;
-    background-color: rgba(255, 255, 255, 0.1);
-
-    .icon {
-      color: $black;
-    }
-  }
-}
-
-.dropdownBtn {
-  border-radius: 0.5em;
-  padding: 0.5em;
-  color: $black;
-  display: flex;
-  align-items: center;
-  width: 100%;
-  text-align: left;
-  background-color: transparent;
-  border: none;
-  cursor: pointer;
-  transition: all 0.15s ease-in-out;
-
-  &.active {
-    color: $black;
-    border-right: 4px solid $primary;
-    border-bottom: 1px solid $primary;
-    background-color: rgba(255, 255, 255, 0.1);
-
-    .icon {
-      color: $black;
-    }
-  }
-
-  &:hover {
-    color: $primary;
-  }
-
-  &.rotate {
-    .arrow {
-      transform: rotate(360deg);
-    }
-  }
-}
-
-.icon {
-  flex-shrink: 0;
-  font-size: 24px;
-  color: $black;
-  margin-right: 20px;
-  transition: margin-right 0.3s ease-in-out;
-}
-
-.label {
-  font-size: 14px;
-  width: 100%;
-  opacity: 1;
-  transition: opacity 0.3s ease-in-out 0.1s, transform 0.3s ease-in-out 0.1s; /* Slight delay for stagger */
-  transform: translateX(0); /* Default state */
-}
-
-.arrow {
-  margin-left: auto;
-  font-size: 24px;
-  opacity: 1;
-  transition: opacity 0.3s ease-in-out 0.1s, transform 0.3s ease-in-out 0.1s, rotate 0.15s ease-in-out; /* Added transition */
-  transform: translateX(0); /* Default state */
-}
-
-.subMenu {
-  list-style: none;
-  padding-left: 50px;
-  transition: max-height 0.15s ease-in-out, opacity 0.15s ease-in-out;
-  max-height: 0;
-  opacity: 0;
-  overflow: hidden;
-
-  &.show {
-    opacity: 1;
-    max-height: 200px;
-  }
-
-  .subMenuLink {
-    display: block;
+    border-radius: 0.5em;
     padding: 0.5em;
-    color: $black;
     text-decoration: none;
-    font-size: 14px;
-    opacity: 1;
-    transition: opacity 0.3s ease-in-out 0.15s, transform 0.3s ease-in-out 0.15s, color 0.15s ease-in-out; /* Slight delay */
-    transform: translateX(0); /* Default state */
+    color: var(--text);
+    display: flex;
+    align-items: center;
+    transition: color 0.15s ease-in-out;
 
     &:hover {
-      color: $primary;
+        color: $primary;
+        text-decoration: none;
     }
 
     &.active {
-      color: $primary;
-      background-color: rgba(255, 255, 255, 0.1);
+        border-right: 4px solid $primary;
+        border-bottom: 1px solid $primary;
+        background-color: rgba(255, 255, 255, 0.1);
+
+        .icon {
+        }
     }
-  }
 }
 
-.userSection {
-  margin-top: auto;
-  padding: 0 3px;
-  padding-bottom: 10px;
+.dropdownBtn {
+    border-radius: 0.5em;
+    padding: 0.5em;
+    color: var(--text);
+    display: flex;
+    align-items: center;
+    width: 100%;
+    text-align: left;
+    background-color: transparent;
+    border: none;
+    cursor: pointer;
+    transition: all 0.15s ease-in-out;
+
+    &.active {
+        border-right: 4px solid $primary;
+        border-bottom: 1px solid $primary;
+        background-color: rgba(255, 255, 255, 0.1);
+
+        .icon {
+        }
+    }
+
+    &:hover {
+        color: $primary;
+    }
+
+    &.rotate {
+        .arrow {
+            transform: rotate(360deg);
+        }
+    }
 }
 
-.userBtn {
-  width: 100%;
-  display: flex;
-  align-items: center;
-  padding: 0.6em;
-  background-color: transparent;
-  border: none;
-  border-radius: 0.5em;
-  color: $black;
-  cursor: pointer;
-  transition: background-color 0.15s ease-in-out;
+.icon {
+    flex-shrink: 0;
+    font-size: 24px;
 
-  &:hover {
-    background-color: $hover;
-  }
-
-  &.active {
-    background-color: rgba(255, 255, 255, 0.1);
-  }
+    margin-right: 20px;
+    transition: margin-right 0.3s ease-in-out;
 }
 
-.userIcon {
-  font-size: 24px;
-  color: $black;
-  margin-right: 20px;
-  flex-shrink: 0;
-}
-
-.userInfo {
-  display: flex;
-  flex-direction: row;
-  flex-grow: 1;
-  text-align: left;
-  opacity: 1;
-  transition: opacity 0.3s ease-in-out 0.15s, transform 0.3s ease-in-out 0.15s; /* Slight delay */
-  transform: translateX(0); /* Default state */
-}
-
-.userDetails {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-}
-
-.userName {
-  font-size: 14px;
-  font-weight: 500;
-  color: $black;
-  white-space: nowrap;
-}
-
-.userRole {
-  font-size: 12px;
-  color: $black;
-}
-
-.userArrow {
-  margin-left: auto;
-  font-size: 24px;
-  opacity: 1;
-  transition: opacity 0.3s ease-in-out 0.15s, transform 0.3s ease-in-out 0.15s; /* Added transition */
-  transform: translateX(0); /* Default state */
-}
-
-.userDropup {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-  background-color: $white;
-  position: absolute;
-  bottom: 60px;
-  left: 10px;
-  right: 10px;
-  max-height: 0;
-  opacity: 0;
-  overflow: hidden;
-  transition: max-height 0.15s ease-in-out, opacity 0.15s ease-in-out;
-
-  &.show {
-    max-height: 200px;
+.label {
+    font-size: 14px;
+    width: 100%;
     opacity: 1;
-  }
+    transition: opacity 0.3s ease-in-out 0.1s, transform 0.3s ease-in-out 0.1s;
+    transform: translateX(0);
 }
 
-.dropupLink {
-  display: block;
-  padding: 0.85em;
-  color: $black;
-  text-decoration: none;
-  transition: background-color 0.15s ease-in-out;
+.arrow {
+    margin-left: auto;
+    font-size: 24px;
+    opacity: 1;
+    transition: opacity 0.3s ease-in-out 0.1s, transform 0.3s ease-in-out 0.1s,
+        rotate 0.15s ease-in-out;
+    transform: translateX(0);
+}
 
-  &:hover {
-    background-color: $primary;
-    text-decoration: none;
-  }
+.subMenu {
+    list-style: none;
+    padding-left: 50px;
+    transition: max-height 0.15s ease-in-out, opacity 0.15s ease-in-out;
+    max-height: 0;
+    opacity: 0;
+    overflow: hidden;
+
+    &.show {
+        opacity: 1;
+        max-height: 200px;
+    }
+
+    .subMenuLink {
+        display: block;
+        padding: 0.5em;
+        color: var(--text);
+        text-decoration: none;
+        font-size: 14px;
+        opacity: 1;
+        transition: opacity 0.3s ease-in-out 0.15s,
+            transform 0.3s ease-in-out 0.15s, color 0.15s ease-in-out;
+        transform: translateX(0);
+
+        &:hover {
+            color: $primary;
+        }
+
+        &.active {
+            color: $primary;
+            background-color: var(--active-menu);
+        }
+    }
 }

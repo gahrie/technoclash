@@ -603,8 +603,20 @@ class ComposerStaticInit88970a0117c062eed55fa8728fc43833
     );
 
     public static $classMap = array (
+        'App\\Http\\Controllers\\API\\AuthController' => __DIR__ . '/../..' . '/app/Http/Controllers/API/AuthController.php',
+        'App\\Http\\Controllers\\API\\SignUpController' => __DIR__ . '/../..' . '/app/Http/Controllers/API/SignUpController.php',
+        'App\\Http\\Controllers\\API\\SubmissionController' => __DIR__ . '/../..' . '/app/Http/Controllers/API/SubmissionController.php',
+        'App\\Http\\Controllers\\API\\UserController' => __DIR__ . '/../..' . '/app/Http/Controllers/API/UserController.php',
         'App\\Http\\Controllers\\Controller' => __DIR__ . '/../..' . '/app/Http/Controllers/Controller.php',
+        'App\\Http\\Resources\\UserResource' => __DIR__ . '/../..' . '/app/Http/Resources/UserResource.php',
+        'App\\Mail\\PasswordResetRequestMail' => __DIR__ . '/../..' . '/app/Mail/PasswordResetRequestMail.php',
+        'App\\Mail\\PasswordResetSuccessMail' => __DIR__ . '/../..' . '/app/Mail/PasswordResetSuccessMail.php',
+        'App\\Mail\\VerificationCodeMail' => __DIR__ . '/../..' . '/app/Mail/VerificationCodeMail.php',
+        'App\\Models\\ChallengeProblem' => __DIR__ . '/../..' . '/app/Models/ChallengeProblem.php',
+        'App\\Models\\Submission' => __DIR__ . '/../..' . '/app/Models/Submission.php',
+        'App\\Models\\TestCase' => __DIR__ . '/../..' . '/app/Models/TestCase.php',
         'App\\Models\\User' => __DIR__ . '/../..' . '/app/Models/User.php',
+        'App\\Models\\UserProfile' => __DIR__ . '/../..' . '/app/Models/UserProfile.php',
         'App\\Providers\\AppServiceProvider' => __DIR__ . '/../..' . '/app/Providers/AppServiceProvider.php',
         'Attribute' => __DIR__ . '/..' . '/symfony/polyfill-php80/Resources/stubs/Attribute.php',
         'Brick\\Math\\BigDecimal' => __DIR__ . '/..' . '/brick/math/src/BigDecimal.php',

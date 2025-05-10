@@ -1,0 +1,36 @@
+@import "../../../sass/variables";
+@import "../../../sass/global.scss";
+
+.container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    flex-direction: column;
+    background-color: var(--bg);
+}
+
+.loading {
+    font-size: 26px;
+    color: #fff;
+    z-index: 10000;
+}
+
+.spinner {
+    width: 50px;
+    height: 50px;
+    border: 3px solid var(--text);
+    border-top: 3px solid $primary;
+    margin-bottom: 10px;
+    border-radius: 50%;
+    animation: spin 10s linear infinite;
+}
+
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
+}

@@ -1,74 +1,95 @@
 @import "../../../../sass/variables";
 
 .ui-button {
-  border: none;
-  border-radius: 5px;
-  font-size: 1.2rem;
-  text-decoration: none;
-  cursor: pointer;
-  transition: background-color 0.3s;
-  position: relative;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 10px 0;
+    border: none;
+    border-radius: 5px;
+    font-size: 14px;
+    text-decoration: none;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    padding: 15px;
 
-  &--primary {
-    background-color: $black;
-    color: $white;
-    &:hover,
-    &:focus {
-      text-decoration: none;
-      background-color: $primary;
+    &--form {
+        width: 100%;
+        background-color: $primary;
+        color: #ffffff;
+        &:hover,
+        &:focus {
+            text-decoration: none;
+            background-color: $primary-hover;
+        }
     }
-  }
 
-  &--secondary {
-    background-color: $primary;
-    color: $white;
-    &:hover,
-    &:focus {
-      text-decoration: none;
-      background-color: darken($primary, 10%);
+    &--secondary-form {
+        padding: 10px 15px;
+        background-color: $primary;
+        color: #ffffff;
+        &:hover,
+        &:focus {
+            text-decoration: none;
+            background-color: $primary-hover;
+        }
     }
-  }
-
-  &--icon {
-    background: none;
-    color: $black;
-    font-size: 1.5rem;
-    padding: 0.5rem;
-    border-radius: 4px;
-
-    &:hover,
-    &:focus {
-      color: $primary;
-      background: rgba(0, 0, 0, 0.05);
+    &--primary {
+        background-color: #0a101c;
+        color: #ffffff;
+        &:hover,
+        &:focus {
+            text-decoration: none;
+            background-color: $primary;
+        }
     }
-  }
 
-  &[disabled] {
-    background-color: $disabled;
-    cursor: not-allowed;
-  }
+    &--secondary {
+        background-color: $primary;
+        color: #ffffff;
+        &:hover,
+        &:focus {
+            text-decoration: none;
+            background-color: $primary-hover;
+        }
+    }
 
-  .spinner {
-    display: inline-block;
-    width: 20px;
-    height: 20px;
-    border: 3px solid $white;
-    border-top: 3px solid transparent;
-    border-radius: 50%;
-    animation: spin 1s linear infinite;
-  }
+    &--icon {
+        background: none;
+        color: #0a101c;
+        font-size: 1.5rem;
+        padding: 0.5rem;
+        border-radius: 4px;
 
-  .button-content-hidden {
-    visibility: hidden;
-  }
+        &:hover,
+        &:focus {
+            color: $primary;
+            background: rgba(0, 0, 0, 0.05);
+        }
+    }
+
+    &[disabled] {
+        background-color: $disabled;
+        cursor: not-allowed;
+    }
+
+    .spinner {
+        display: inline-block;
+        width: 20px;
+        height: 20px;
+        border: 3px solid #ffffff;
+        border-top: 3px solid transparent;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+    }
+
+    .button-content-hidden {
+        visibility: hidden;
+    }
 }
 
 @keyframes spin {
-  to {
-    transform: rotate(360deg);
-  }
+    to {
+        transform: rotate(360deg);
+    }
 }

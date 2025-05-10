@@ -18,6 +18,7 @@ class UserResource extends JsonResource
             'verification_code' => $this->verification_code,
             'verification_code_expires_at' => $this->verification_code_expires_at,
             'profile' => [
+                'user_id' => $this->profile->user_id,
                 'first_name' => $this->profile->first_name ?? null,
                 'last_name' => $this->profile->last_name ?? null,
                 'username' => $this->profile->username ?? null,

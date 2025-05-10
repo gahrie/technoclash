@@ -11,7 +11,8 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\Rule;
-
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 class UserController extends Controller
 {
     /**
@@ -23,8 +24,13 @@ class UserController extends Controller
         $role = $request->query('role', []);
         $status = $request->query('status', []);
         $search = $request->query('search', '');
+        $sortBy = $request->query('sort_by', 'id');
+        $sortDirection = $request->query('sort_direction', 'asc');
 
-        $query = User::with('profile');
+        $query = User::with('profile')->select('users.*');
+
+        // Exclude the authenticated user
+        $query->where('users.id', '!=', auth()->id());
 
         if (!empty($role)) {
             $query->whereIn('role', $role);
@@ -37,12 +43,24 @@ class UserController extends Controller
         if ($search) {
             $query->where(function ($q) use ($search) {
                 $q->where('email', 'like', "%{$search}%")
-                  ->orWhereHas('profile', function ($q2) use ($search) {
-                      $q2->where('first_name', 'like', "%{$search}%")
-                         ->orWhere('last_name', 'like', "%{$search}%")
-                         ->orWhere('username', 'like', "%{$search}%");
-                  });
+                ->orWhereHas('profile', function ($q2) use ($search) {
+                    $q2->where('first_name', 'like', "%{$search}%")
+                        ->orWhere('last_name', 'like', "%{$search}%")
+                        ->orWhere('username', 'like', "%{$search}%");
+                });
             });
+        }
+
+        // Handle sorting
+        if ($sortBy) {
+            if ($sortBy === 'name') {
+                $query->join('user_profiles', 'users.id', '=', 'user_profiles.user_id')
+                ->orderBy('user_profiles.first_name', $sortDirection)
+                ->orderBy('user_profiles.last_name', $sortDirection);
+
+            } else {
+                $query->orderBy($sortBy, $sortDirection);
+            }
         }
 
         $users = $query->paginate($perPage);
@@ -53,7 +71,7 @@ class UserController extends Controller
                 'pagination' => [
                     'current_page' => $users->currentPage(),
                     'total_pages' => $users->lastPage(),
-                    'total' => $users->total(),
+                    'total' => $users->total()
                 ],
             ],
         ]);
@@ -64,23 +82,45 @@ class UserController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'first_name' => ['required', 'string', 'max:255'],
-            'last_name' => ['required', 'string', 'max:255'],
-            'username' => ['required', 'string', 'max:255', 'unique:user_profiles'],
+            'first_name' => ['required', 'string', 'max:255', 'regex:/^[a-zA-Z\'-]+$/'],
+            'last_name' => ['required', 'string', 'max:255', 'regex:/^[a-zA-Z\'-]+$/'],
+            'username' => ['required', 'string', 'max:255', 'regex:/^[a-zA-Z0-9]+$/', 'unique:user_profiles'],
             'gender' => ['required', 'in:male,female,other'],
             'bio' => ['nullable', 'string'],
-            'university' => ['nullable', 'string', 'max:255'],
+            'university' => ['nullable', 'string', 'max:255', 'regex:/^[a-zA-Z\s]+$/'],
             'email' => ['required', 'email', 'max:255', 'unique:users'],
-            'role' => ['required', 'in:admin,user,moderator'],
-            'password' => ['required', 'string', 'min:8', 'confirmed'],
-            'avatar' => ['nullable', 'image', 'mimes:jpeg,png,jpg,gif', 'max:2048'], // Max 2MB
+            'role' => ['required', 'in:admin,student,professor'],
+            'password' => [
+                'required',
+                'min:8',
+                'regex:/[A-Z]/',
+                'regex:/[a-z]/',
+                'regex:/[0-9]/',
+                'regex:/[!@#$%^&*(),_.?":{}|<>]/',
+                'confirmed'
+            ],
+            'avatar' => ['nullable', 'image', 'mimes:png', 'max:2048'],
+        ], [
+            'first_name.regex' => 'First name can only contain letters, hyphens, and apostrophes.',
+            'last_name.regex' => 'Last name can only contain letters, hyphens, and apostrophes.',
+            'username.regex' => 'Username can only contain letters and numbers.',
+            'university.regex' => 'University can only contain letters and spaces.',
+            'password.min' => 'Password must be at least 8 characters.',
+            'password.regex' => 'Password must contain at least 1 uppercase letter, 1 lowercase letter, 1 number, and 1 special character.',
+            'avatar.mimes' => 'Avatar must be a PNG file.',
+            'avatar.max' => 'Avatar cannot exceed 2MB.',
         ]);
+
+        // Create avatars directory if it doesn't exist
+        Storage::disk('public')->makeDirectory('avatars');
 
         $avatarPath = null;
         if ($request->hasFile('avatar')) {
-            $avatarPath = $request->file('avatar')->store('avatars', 'public');
+            $uniqueName = 'avatar_' . Str::uuid() . '.png';
+            $avatarPath = 'avatars/' . $uniqueName;
+            $request->file('avatar')->storeAs('avatars', $uniqueName, 'public');
         }
-        
+
         $user = User::create([
             'email' => $request->email,
             'email_verified_at' => now(),
@@ -90,25 +130,25 @@ class UserController extends Controller
         ]);
 
         $userProfile = UserProfile::create([
-                'user_id' => $user->id,
-                'first_name' => $request->first_name,
-                'last_name' => $request->last_name,
-                'username' => $request->username,
-                'gender' => $request->gender,
-                'avatar' => $request->avatar ?? 'default-avatar.png',
-                'bio' => $request->bio ?? null,
-                'university' => $request->university ?? null,
-                'points' => 1000,
-                'win_streak' => 0,
-            ]);
+            'user_id' => $user->id,
+            'first_name' => ucwords(strtolower($request->first_name)),
+            'last_name' => ucwords(strtolower($request->last_name)),
+            'username' => $request->username,
+            'gender' => $request->gender,
+            'avatar' => $avatarPath ?? null,
+            'bio' => $request->bio ?? null,
+            'university' => $request->university ? strtoupper($request->university) : null,
+            'points' => 1000,
+            'win_streak' => 0,
+        ]);
 
-            // Return success response
-            return response()->json([
-                'message' => 'User and profile created successfully!',
-                'user' => $user,
-                'profile' => $userProfile,
-            ], 201);
+        return response()->json([
+            'message' => 'User and profile created successfully!',
+            'user' => $user,
+            'profile' => $userProfile,
+        ], 201);
     }
+
     /**
      * Display the specified resource.
      */
@@ -130,19 +170,49 @@ class UserController extends Controller
             return response()->json(['message' => 'User profile not found'], 404);
         }
 
-        // Use 'required_without' to ensure fields are present unless explicitly unchanged
         $validated = $request->validate([
-            'first_name' => ['required_without:_method', 'string', 'max:255'],
-            'last_name' => ['required_without:_method', 'string', 'max:255'],
-            'username' => ['required_without:_method', 'string', 'max:255', Rule::unique('user_profiles')->ignore($userProfile->id)],
-            'gender' => ['required_without:_method', 'in:male,female,other'],
+            'first_name' => ['required', 'string', 'max:255', 'regex:/^[a-zA-Z\'-]+$/'],
+            'last_name' => ['required', 'string', 'max:255', 'regex:/^[a-zA-Z\'-]+$/'],
+            'username' => [
+                'required',
+                'string',
+                'max:255',
+                'regex:/^[a-zA-Z0-9]+$/',
+                Rule::unique('user_profiles')->ignore($userProfile->id),
+            ],
+            'gender' => ['required', 'in:male,female,other'],
             'bio' => ['nullable', 'string'],
-            'university' => ['nullable', 'string', 'max:255'],
-            'email' => ['required_without:_method', 'email', 'max:255', Rule::unique('users')->ignore($user->id)],
-            'role' => ['required_without:_method', 'in:admin,user,moderator'],
-            'password' => ['nullable', 'string', 'min:8', 'confirmed'],
-            'avatar' => ['nullable', 'image', 'mimes:jpeg,png,jpg,gif', 'max:2048'],
+            'university' => ['nullable', 'string', 'max:255', 'regex:/^[a-zA-Z\s]+$/'],
+            'email' => [
+                'required',
+                'email',
+                'max:255',
+                Rule::unique('users')->ignore($user->id),
+            ],
+            'role' => ['required', 'in:admin,student,professor'],
+            'password' => [
+                'nullable',
+                'min:8',
+                'regex:/[A-Z]/',
+                'regex:/[a-z]/',
+                'regex:/[0-9]/',
+                'regex:/[!@#$%^&*(),_.?":{}|<>]/',
+                'confirmed',
+            ],
+            'avatar' => ['nullable', 'image', 'mimes:png', 'max:2048'],
+        ], [
+            'first_name.regex' => 'First name can only contain letters, hyphens, and apostrophes.',
+            'last_name.regex' => 'Last name can only contain letters, hyphens, and apostrophes.',
+            'username.regex' => 'Username can only contain letters and numbers.',
+            'university.regex' => 'University can only contain letters and spaces.',
+            'password.min' => 'Password must be at least 8 characters.',
+            'password.regex' => 'Password must contain at least 1 uppercase letter, 1 lowercase letter, 1 number, and 1 special character.',
+            'avatar.mimes' => 'Avatar must be a PNG file.',
+            'avatar.max' => 'Avatar cannot exceed 2MB.',
         ]);
+
+        // Create avatars directory if it doesn't exist
+        Storage::disk('public')->makeDirectory('avatars');
 
         $avatarPath = $userProfile->avatar;
         if ($request->hasFile('avatar')) {
@@ -150,29 +220,32 @@ class UserController extends Controller
             if ($avatarPath) {
                 Storage::disk('public')->delete($avatarPath);
             }
-            $avatarPath = $request->file('avatar')->store('avatars', 'public');
+            $uniqueName = 'avatar_' . Str::uuid() . '.png';
+            $avatarPath = 'avatars/' . $uniqueName;
+            $request->file('avatar')->storeAs('avatars', $uniqueName, 'public');
         }
 
         $user->update([
-            'email' => $validated['email'] ?? $user->email,
-            'role' => $validated['role'] ?? $user->role,
+            'email' => $validated['email'],
+            'role' => $validated['role'],
             'password' => !empty($validated['password']) ? Hash::make($validated['password']) : $user->password,
         ]);
 
         $userProfile->update([
-            'first_name' => $validated['first_name'] ?? $userProfile->first_name,
-            'last_name' => $validated['last_name'] ?? $userProfile->last_name,
-            'username' => $validated['username'] ?? $userProfile->username,
-            'gender' => $validated['gender'] ?? $userProfile->gender,
-            'avatar' => $avatarPath ?? $userProfile->avatar,
-            'bio' => $validated['bio'] ?? $userProfile->bio,
-            'university' => $validated['university'] ?? $userProfile->university,
+            'first_name' => ucwords(strtolower($validated['first_name'])),
+            'last_name' => ucwords(strtolower($validated['last_name'])),
+            'username' => $validated['username'],
+            'gender' => $validated['gender'],
+            'avatar' => $avatarPath,
+            'bio' => $validated['bio'] ?? null,
+            'university' => $validated['university'] ? strtoupper($validated['university']) : null,
         ]);
 
         return response()->json([
-            'message' => 'User updated successfully',
-            'user' => $user->load('profile'),
-        ]);
+            'message' => 'User and profile updated successfully!',
+            'user' => $user,
+            'profile' => $userProfile,
+        ], 200);
     }
 
     public function deactivateUser($id)
@@ -184,7 +257,7 @@ class UserController extends Controller
         $user->save();
 
         return response()->json([
-            'message' => 'User deactivate successfully',
+            'message' => 'User deactivated successfully',
         ], 200);
     }
 
@@ -196,10 +269,43 @@ class UserController extends Controller
         $user->status = 'Activated';
         $user->save();
         return response()->json([
-            'message' => 'User activate successfully',
+            'message' => 'User activated successfully',
         ], 200);
     }
+    /**
+     * Retrieve demographic data for users.
+     *
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function demographics()
+    {
+        try {
+            $totalUsers = User::count();
+            $totalAdmins = User::where('role', 'admin')->count();
+            $totalProfessors = User::where('role', 'professor')->count();
+            $totalStudents = User::where('role', 'student')->count();
+            $totalActive = User::where('status', 'Activated')->count();
+            $totalInactive = User::where('status', 'Deactivated')->count();
 
+            return response()->json([
+                'total_users' => $totalUsers,
+                'total_admins' => $totalAdmins,
+                'total_professors' => $totalProfessors,
+                'total_students' => $totalStudents,
+                'total_active' => $totalActive,
+                'total_inactive' => $totalInactive,
+            ], 200);
+        } catch (\Exception $e) {
+            Log::error('Error fetching demographics: ' . $e->getMessage(), [
+                'user_id' => auth()->id(),
+                'trace' => $e->getTraceAsString(),
+            ]);
+
+            return response()->json([
+                'message' => 'Failed to fetch demographic data.',
+            ], 500);
+        }
+    }
     /**
      * Remove the specified resource from storage.
      */

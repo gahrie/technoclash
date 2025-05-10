@@ -1,0 +1,50 @@
+@import "../../../../sass/variables";
+@import "../../../../sass/global.scss";
+
+.ui-textarea-container {
+    position: relative;
+    flex: 1;
+}
+
+.ui-textarea {
+    width: 100%;
+    padding: 10px;
+    border: 2px solid var(--border);
+    border-radius: 4px;
+    background-color: var(--secondary-bg);
+    color: var(--text);
+    transition: border-color 0.3s ease-in-out;
+    font-size: 14px;
+    min-height: 80px;
+    resize: vertical;
+
+    &:focus {
+        outline: none;
+        border-color: $primary;
+    }
+
+    &--error {
+        border-color: $error;
+    }
+
+    &:focus + .ui-textarea-span,
+    &--filled + .ui-textarea-span {
+        background-color: var(--secondary-bg);
+        color: $primary;
+        font-size: 10px;
+        font-weight: bold;
+        padding: 0 5px;
+        left: 5px;
+        top: -6px;
+    }
+}
+
+.ui-textarea-span {
+    position: absolute;
+    top: 15px; // Adjusted for textarea's padding
+    left: 10px;
+    color: var(--placeholder);
+    font-size: 14px;
+    pointer-events: none;
+    transition: all 0.2s ease-in-out;
+}

@@ -6,8 +6,20 @@ $vendorDir = dirname(__DIR__);
 $baseDir = dirname($vendorDir);
 
 return array(
+    'App\\Http\\Controllers\\API\\AuthController' => $baseDir . '/app/Http/Controllers/API/AuthController.php',
+    'App\\Http\\Controllers\\API\\SignUpController' => $baseDir . '/app/Http/Controllers/API/SignUpController.php',
+    'App\\Http\\Controllers\\API\\SubmissionController' => $baseDir . '/app/Http/Controllers/API/SubmissionController.php',
+    'App\\Http\\Controllers\\API\\UserController' => $baseDir . '/app/Http/Controllers/API/UserController.php',
     'App\\Http\\Controllers\\Controller' => $baseDir . '/app/Http/Controllers/Controller.php',
+    'App\\Http\\Resources\\UserResource' => $baseDir . '/app/Http/Resources/UserResource.php',
+    'App\\Mail\\PasswordResetRequestMail' => $baseDir . '/app/Mail/PasswordResetRequestMail.php',
+    'App\\Mail\\PasswordResetSuccessMail' => $baseDir . '/app/Mail/PasswordResetSuccessMail.php',
+    'App\\Mail\\VerificationCodeMail' => $baseDir . '/app/Mail/VerificationCodeMail.php',
+    'App\\Models\\ChallengeProblem' => $baseDir . '/app/Models/ChallengeProblem.php',
+    'App\\Models\\Submission' => $baseDir . '/app/Models/Submission.php',
+    'App\\Models\\TestCase' => $baseDir . '/app/Models/TestCase.php',
     'App\\Models\\User' => $baseDir . '/app/Models/User.php',
+    'App\\Models\\UserProfile' => $baseDir . '/app/Models/UserProfile.php',
     'App\\Providers\\AppServiceProvider' => $baseDir . '/app/Providers/AppServiceProvider.php',
     'Attribute' => $vendorDir . '/symfony/polyfill-php80/Resources/stubs/Attribute.php',
     'Brick\\Math\\BigDecimal' => $vendorDir . '/brick/math/src/BigDecimal.php',

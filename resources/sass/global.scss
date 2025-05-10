@@ -1,0 +1,20 @@
+.light {
+    --bg: #f3f4f6;
+    --text: #0a101c;
+    --secondary-bg: #fff;
+    --border: #ccc;
+    --placeholder: #6c757d;
+    --active-menu: rgba(17, 24, 39, 0.1);
+    --secondary-text: #6b7280; /* Medium gray for secondary text in dark theme */
+}
+
+.dark {
+    --bg: #0a101c;
+    --text: #ffffff;
+    --secondary-bg: #111827;
+    --border: #334155;
+    --placeholder: #ccc;
+    --active-menu: rgba(243, 244, 246, 0.1);
+    --border: #2a2e39;
+    --secondary-text: #a0aec0; /* Light gray for secondary text in light theme */
+}

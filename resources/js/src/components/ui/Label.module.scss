@@ -1,8 +1,9 @@
-@import '../../../../sass/variables';
+@import "../../../../sass/variables";
+@import "../../../../sass/global.scss";
 
 .ui-label {
-  display: block;
-  margin-bottom: 5px;
-  font-weight: bold;
-  color: $gray;
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+    color: var(--text);
 }

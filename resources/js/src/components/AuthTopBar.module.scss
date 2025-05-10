@@ -1,0 +1,255 @@
+@import "../../../sass/variables";
+@import "../../../sass/global.scss";
+
+.topbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background-color: var(--secondary-bg);
+    padding: 15px 20px;
+    box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
+}
+
+.logo {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: var(--text);
+    cursor: default;
+}
+
+.centerContainer {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex: 1;
+    gap: 20px;
+}
+
+.ping {
+    font-size: 1rem;
+    font-weight: bold;
+    color: var(--text);
+
+    span {
+        cursor: default;
+        padding: 4px 8px;
+        border-radius: 4px;
+    }
+
+    .low {
+        background-color: #28a745; // Green for ping < 100ms
+    }
+
+    .medium {
+        background-color: #ffc107; // Yellow for 100ms <= ping < 200ms
+    }
+
+    .high {
+        background-color: #dc3545; // Red for ping >= 200ms
+    }
+}
+
+.nav {
+    display: flex;
+    justify-content: center;
+
+    ul {
+        display: flex;
+        list-style: none;
+        margin: 0;
+        padding: 0;
+        li {
+            position: relative;
+            display: flex;
+            align-items: center;
+            color: var(--text);
+            font-size: 1rem;
+            cursor: pointer;
+            transition: $transition;
+            margin: 0 10px;
+            padding: 10px 15px;
+            &:hover {
+                color: $primary;
+            }
+        }
+    }
+}
+
+.playItem {
+    position: relative;
+    background-color: $primary;
+    color: #fff !important;
+    border-radius: 14px;
+}
+
+.playIcon {
+    margin: 0 10px;
+    font-size: 1rem;
+    color: #fff;
+}
+
+.playDropdown {
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: var(--secondary-bg);
+    border-radius: 4px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    z-index: 1000;
+    
+    .playDropdownTitle {
+        font-size: 14px;
+        font-weight: 500;
+        padding: 20px;
+    }
+
+    ul {
+        display: flex;
+        flex-direction: column;
+        list-style: none;
+        margin: 0;
+
+
+        li {
+            display: flex;
+            align-items: center;
+            padding: 20px;
+            margin: 0;
+            color: var(--text);
+            font-size: 14px;
+            cursor: pointer;
+            transition: $transition;
+
+            &:hover {
+                background-color: rgba($color: $primary, $alpha: 0.1);
+            }
+
+            .playDropdownItem {
+                display: flex;
+                flex-direction: column;
+                
+                p {
+                    font-size: 14px;
+                    font-weight: 500;
+                    margin-bottom: 5px;
+                    white-space: nowrap;
+                }
+
+                span {
+                    font-size: 12px;
+                    color: var(--secondary-text);
+                }
+            }
+        }
+
+        .disabled {
+            color: var(--secondary-text);
+            cursor: not-allowed;
+            &:hover {
+                background-color: transparent;
+            }
+        }
+    }
+}
+
+.dropdownIcon {
+    margin-right: 10px;
+    font-size: 1.2rem;
+
+    &:hover {
+        color: $primary;
+    }
+}
+
+.disabled .dropdownIcon {
+    color: var(--secondary-text);
+}
+
+.icon {
+    margin-right: 8px;
+    font-size: 1.2rem;
+}
+
+.user {
+    position: relative;
+
+    .userInfo {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        cursor: pointer;
+    }
+
+    .userIcons {
+        display: flex;
+        list-style: none;
+        margin: 0;
+        padding: 0;
+        li {
+            display: flex;
+            align-items: center;
+            margin: 0 10px;
+        }
+    }
+
+    .avatar {
+        width: 32px;
+        height: 32px;
+        background-color: #666;
+        color: var(--text);
+        border-radius: 50%;
+        font-size: 32px;
+    }
+
+    .userDetails {
+        display: flex;
+        flex-direction: column;
+
+        .name {
+            color: var(--text);
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .role {
+            font-size: 12px;
+            color: var(--secondary-text);
+            text-transform: capitalize;
+        }
+    }
+
+    .arrow {
+        font-size: 1rem;
+        color: var(--text);
+    }
+
+    .dropdown {
+        position: absolute;
+        top: 100%;
+        right: 0;
+        background-color: var(--secondary-bg);
+        border-radius: 4px;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        width: 150px;
+        z-index: 1000;
+
+        ul {
+            list-style: none;
+            margin: 0;
+            padding: 10px 0;
+
+            li {
+                padding: 10px 20px;
+                color: var(--text);
+                font-size: 14px;
+                cursor: pointer;
+                transition: $transition;
+
+                &:hover {
+                    background-color: rgba($color: $primary, $alpha: 0.1);
+                }
+            }
+        }
+    }
+}

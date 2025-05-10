@@ -1,31 +1,30 @@
-// Body
-$body-bg: #f8fafc;
-// Typography
-$font-size-base: 0.9rem;
-$line-height-base: 1.6;
-$black: #1a1a1a; // Dark background
-$white: #ffffff; // Light text/icons
-$primary: #ffae00; // Active state (adjust as needed)
-$error: #ff4d4d;
-$disabled: #95a5a6; 
-$gray: #6c757d; 
-$line: #ccc; // Border color
+$primary: #e53e3e;
+$primary-hover: #c53030;
+
+$dark: #0a101c;
+$secondary--dark: #111827;
+$border--dark: #2a2e39;
+$light: #ffffff;
+$secondary--light: #f3f4f6;
+$border--light: #d1d5db;
+$placeholder: #ccc;
+
+$success: #28a745;
+$error: #dc3545;
+$warning: #ffc107;
+$disabled: #8a92a6;
+
+$points: #ffd700;
+$secondary: #334155;
+$line: #6c757d; // Border color
 $hover: rgba(255, 255, 255, 0.2); // Hover background
 
 $navbar-bg: rgba(255, 255, 255, 0.95);
-$navbar-bg-sticky: #ffffff;
-$navbar-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-$accent-color: #ffae00;
-$navbar-height: 70px;
+$shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+
 $transition: all 0.3s ease-in-out;
 
 $breakpoint-laptop: 1024px; // 13-15" laptops
-
-// Standard desktops
 $breakpoint-desktop: 1280px; // Typical desktop monitors
-
-// Large screens
 $breakpoint-lg-desktop: 1440px; // High-res monitors
-
-// Extra large screens
 $breakpoint-xl-desktop: 1920px; // Full HD+ screens

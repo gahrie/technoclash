@@ -14,14 +14,16 @@ Route::post('/signup/information', [SignUpController::class, 'information']);
 Route::post('/signup/verify-email', [SignUpController::class, 'verifyEmail']);
 Route::post('/signup/resend-verification', [SignUpController::class, 'resendVerification']);
 Route::middleware('auth:sanctum')->get('/users', [UserController::class, 'index']);
+
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('/user', [AuthController::class, 'user'])->name('api.user');
 
     // User management routes
     Route::get('/users', [UserController::class, 'index']); // List users
+    Route::get('/users/demographics', [UserController::class, 'demographics']);
     Route::get('/users/{id}', [UserController::class, 'show']); // Fetch single user
     Route::put('/users/{id}', [UserController::class, 'update']); // Update user
-    Route::put('/users/{id}/archive', [UserController::class, 'deactivateUser']);
+    Route::put('/users/{id}/deactivate', [UserController::class, 'deactivateUser']);
     Route::put('/users/{id}/activate', [UserController::class, 'activateUser']);
     Route::prefix('admin')->group(function () {
         Route::post('/users/create', [UserController::class, 'store']);
@@ -29,6 +31,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // List all challenges (GET /api/challenges)
     Route::get('/challenges', [ChallengeProblemController::class, 'index'])->name('challenges.index');
+    Route::get('/challenges/demographics', [ChallengeProblemController::class, 'demographics']);
     // Show a specific challenge (GET /api/challenges/{id})
     Route::get('/challenges/{id}', [ChallengeProblemController::class, 'show'])->name('challenges.show');
     // Create a new challenge (POST /api/challenges)

@@ -1,23 +1,39 @@
-import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
-import axios from 'axios';
-import styles from './UpdateChallenge.module.scss';
+import React, { useState, useEffect } from "react";
+import { useParams, useNavigate, useOutletContext } from "react-router-dom";
+import axios from "axios";
+import { FaArrowLeft } from "react-icons/fa";
+import styles from "./UpdateChallenge.module.scss";
+import Input from "../../components/ui/Input";
+import Textarea from "../../components/ui/Textarea";
+import CustomSelect from "../../components/ui/CustomSelect";
+import Button from "../../components/ui/Button";
+import Checkbox from "../../components/ui/Checkbox";
 
 const UpdateChallenge = () => {
     const { id } = useParams();
     const navigate = useNavigate();
-    const [title, setTitle] = useState('');
-    const [description, setDescription] = useState('');
-    const [difficulty, setDifficulty] = useState('');
-    const [constraints, setConstraints] = useState('');
+    const { addNotification } = useOutletContext();
+    const [title, setTitle] = useState("");
+    const [description, setDescription] = useState("");
+    const [difficulty, setDifficulty] = useState("");
+    const [constraints, setConstraints] = useState("");
     const [tags, setTags] = useState([]);
-    const [tagInput, setTagInput] = useState('');
-    const [testCases, setTestCases] = useState([]);
-    const [status, setStatus] = useState('');
-    const [errors, setErrors] = useState({});
-    const [successMessage, setSuccessMessage] = useState('');
+    const [tagInput, setTagInput] = useState("");
+    const [testCases, setTestCases] = useState([{ input: "", expected_output: "", is_sample: false }]);
+    const [status, setStatus] = useState("");
     const [serverErrors, setServerErrors] = useState({});
     const [loading, setLoading] = useState(false);
+
+    const difficultyOptions = [
+        { value: "easy", label: "Easy" },
+        { value: "medium", label: "Medium" },
+        { value: "hard", label: "Hard" },
+    ];
+
+    const statusOptions = [
+        { value: "active", label: "Active" },
+        { value: "archived", label: "Archived" },
+    ];
 
     useEffect(() => {
         const fetchChallenge = async () => {
@@ -25,25 +41,31 @@ const UpdateChallenge = () => {
             try {
                 const response = await axios.get(`/api/challenges/${id}`, {
                     headers: {
-                        Authorization: `Bearer ${localStorage.getItem('token')}`,
+                        Authorization: `Bearer ${localStorage.getItem("token")}`,
                     },
                 });
                 const challenge = response.data.data;
-                setTitle(challenge.title || '');
-                setDescription(challenge.description || '');
-                setDifficulty(challenge.difficulty || '');
-                setConstraints(challenge.constraints || '');
+                setTitle(challenge.title || "");
+                setDescription(challenge.description || "");
+                setDifficulty(challenge.difficulty || "");
+                setConstraints(challenge.constraints || "");
                 setTags(challenge.tags || []);
-                setTestCases(challenge.test_cases || []);
-                setStatus(challenge.status || '');
+                setTestCases(
+                    challenge.test_cases?.length
+                        ? challenge.test_cases
+                        : [{ input: "", expected_output: "", is_sample: false }]
+                );
+                setStatus(challenge.status || "");
             } catch (error) {
                 if (error.response?.status === 404) {
-                    setServerErrors({ general: 'Challenge not found.' });
+                    addNotification("error", "Challenge not found.");
+                    setServerErrors({ general: "Challenge not found." });
                 } else if (error.response?.status === 401) {
-                    setServerErrors({ general: 'Unauthorized. Please log in.' });
-                    navigate('/login');
+                    addNotification("error", "Unauthorized. Please log in.");
+                    navigate("/login");
                 } else {
-                    setServerErrors({ general: 'Failed to load challenge data.' });
+                    addNotification("error", "Failed to load challenge data.");
+                    setServerErrors({ general: "Failed to load challenge data." });
                 }
             } finally {
                 setLoading(false);
@@ -52,16 +74,6 @@ const UpdateChallenge = () => {
         fetchChallenge();
     }, [id, navigate]);
 
-    const validateForm = () => {
-        const newErrors = {};
-        if (!title) newErrors.title = 'Title is required';
-        if (!description) newErrors.description = 'Description is required';
-        if (!difficulty) newErrors.difficulty = 'Difficulty is required';
-        if (testCases.length === 0) newErrors.testCases = 'At least one test case is required';
-        if (!status) newErrors.status = 'Status is required';
-        setErrors(newErrors);
-        return Object.keys(newErrors).length === 0;
-    };
 
     const handleTestCaseChange = (index, field, value) => {
         const newTestCases = [...testCases];
@@ -70,69 +82,89 @@ const UpdateChallenge = () => {
     };
 
     const addTestCase = () => {
-        setTestCases([...testCases, { input: '', expected_output: '', is_sample: false }]);
+        setTestCases([...testCases, { input: "", expected_output: "", is_sample: false }]);
     };
 
     const removeTestCase = (index) => {
-        setTestCases(testCases.filter((_, i) => i !== index));
+        const newTestCases = testCases.filter((_, i) => i !== index);
+        setTestCases(newTestCases.length ? newTestCases : [{ input: "", expected_output: "", is_sample: false }]);
     };
 
     const handleTagInput = (e) => {
-        if (e.key === 'Enter' && tagInput.trim()) {
+        if (e.key === "Enter" && tagInput.trim()) {
             e.preventDefault();
             if (!tags.includes(tagInput.trim())) {
                 setTags([...tags, tagInput.trim()]);
             }
-            setTagInput('');
+            setTagInput("");
         }
     };
 
     const removeTag = (tagToRemove) => {
-        setTags(tags.filter(tag => tag !== tagToRemove));
+        setTags(tags.filter((tag) => tag !== tagToRemove));
+    };
+
+    const resetForm = () => {
+        setTitle("");
+        setDescription("");
+        setDifficulty("");
+        setConstraints("");
+        setTags([]);
+        setTagInput("");
+        setTestCases([{ input: "", expected_output: "", is_sample: false }]);
+        setStatus("");
+        setServerErrors({});
     };
 
     const handleSubmit = async (event) => {
         event.preventDefault();
-        if (!validateForm()) return;
 
-        const data = {
-            title,
-            description,
-            difficulty,
-            constraints,
-            tags,
-            test_cases: testCases,
-            status,
-        };
+        const formData = new FormData();
+        formData.append("title", title);
+        formData.append("description", description);
+        formData.append("difficulty", difficulty);
+        formData.append("constraints", constraints || "");
+        formData.append("tags", JSON.stringify(tags));
+        formData.append("test_cases", JSON.stringify(testCases));
+        formData.append("status", status);
+        formData.append("_method", "PUT");
 
         try {
             setLoading(true);
-            await axios.get('/sanctum/csrf-cookie');
-            const response = await axios.put(`/api/challenges/${id}`, data, {
+            await axios.get("/sanctum/csrf-cookie");
+            await axios.post(`/api/challenges/${id}`, formData, {
                 headers: {
-                    Authorization: `Bearer ${localStorage.getItem('token')}`,
+                    "Content-Type": "multipart/form-data",
+                    Authorization: `Bearer ${localStorage.getItem("token")}`,
                 },
             });
 
-            setSuccessMessage('Challenge updated successfully!');
-            setServerErrors({});
-            setErrors({});
-            setTimeout(() => navigate('/admin/challenges'), 2000);
+            addNotification("success", "Challenge updated successfully!");
         } catch (error) {
             if (error.response) {
                 if (error.response.status === 422) {
-                    setServerErrors(error.response.data.errors);
-                    setSuccessMessage('');
+                    const validationErrors = error.response.data.errors;
+                    const newServerErrors = {
+                        title: validationErrors.title?.[0] || "",
+                        description: validationErrors.description?.[0] || "",
+                        difficulty: validationErrors.difficulty?.[0] || "",
+                        constraints: validationErrors.constraints?.[0] || "",
+                        tags: validationErrors.tags?.[0] || "",
+                        test_cases: validationErrors.test_cases?.[0] || "",
+                        status: validationErrors.status?.[0] || "",
+                    };
+                    setServerErrors(newServerErrors);
+                    addNotification("error", "Please fix the errors in the form.");
                 } else if (error.response.status === 401 || error.response.status === 403) {
-                    setServerErrors({ general: 'You are not authorized to perform this action.' });
-                    setSuccessMessage('');
+                    addNotification("error", "You are not authorized to perform this action.");
+                    setServerErrors({ general: "You are not authorized to perform this action." });
                 } else {
-                    setServerErrors({ general: 'An error occurred. Please try again.' });
-                    setSuccessMessage('');
+                    addNotification("error", "An error occurred. Please try again.");
+                    setServerErrors({ general: "An error occurred. Please try again." });
                 }
             } else {
-                setServerErrors({ general: 'Network error. Please check your connection.' });
-                setSuccessMessage('');
+                addNotification("error", "Network error. Please check your connection.");
+                setServerErrors({ general: "Network error. Please check your connection." });
             }
         } finally {
             setLoading(false);
@@ -141,179 +173,208 @@ const UpdateChallenge = () => {
 
     return (
         <div className={styles.container}>
-            {loading && <div className={styles.loading}>Loading...</div>}
+            <div className={styles.navigation}>
+                <Button variant="secondary-form" to="/admin/challenges">
+                    <FaArrowLeft /> Back
+                </Button>
+            </div>
+            {loading && (
+                <div className={styles.spinnerContainer}>
+                    <div className={styles.spinner}></div>
+                </div>
+            )}
             <form onSubmit={handleSubmit} className={styles.formContainer}>
                 <div className={styles.card}>
-                    {successMessage && <div className={styles.success}>{successMessage}</div>}
-                    {serverErrors.general && <div className={styles.error}>{serverErrors.general}</div>}
+                    {serverErrors.general && (
+                        <div className={styles.error}>{serverErrors.general}</div>
+                    )}
                     <div className={styles.section}>
                         <h2 className={styles.sectionTitle}>Challenge Details</h2>
                         <div className={styles.inputGroup}>
-                            <label htmlFor="title">Title</label>
-                            <input
+                            <Input
                                 id="title"
-                                type="text"
                                 value={title}
-                                onChange={(e) => setTitle(e.target.value)}
-                                className={`${styles.input} ${errors.title ? styles.inputError : ''} ${
-                                    title ? styles.inputFilled : ''
-                                }`}
+                                onChange={(e) => {
+                                    setTitle(e.target.value);
+                                    setServerErrors({ ...serverErrors, title: "" });
+                                }}
+                                placeholder="Enter challenge title"
                                 required
                             />
-                            {errors.title && <span className={styles.error}>{errors.title}</span>}
-                            {serverErrors.title && <span className={styles.error}>{serverErrors.title[0]}</span>}
+                            {serverErrors.title && (
+                                <p className={styles.error}>{serverErrors.title}</p>
+                            )}
                         </div>
                         <div className={styles.inputGroup}>
-                            <label htmlFor="description">Description</label>
-                            <textarea
+                            <Textarea
                                 id="description"
                                 value={description}
-                                onChange={(e) => setDescription(e.target.value)}
-                                className={`${styles.input} ${errors.description ? styles.inputError : ''} ${
-                                    description ? styles.inputFilled : ''
-                                }`}
+                                onChange={(e) => {
+                                    setDescription(e.target.value);
+                                    setServerErrors({ ...serverErrors, description: "" });
+                                }}
+                                placeholder="Enter challenge description"
+                                rows={6}
                                 required
                             />
-                            {errors.description && <span className={styles.error}>{errors.description}</span>}
                             {serverErrors.description && (
-                                <span className={styles.error}>{serverErrors.description[0]}</span>
+                                <p className={styles.error}>{serverErrors.description}</p>
                             )}
                         </div>
                         <div className={styles.inputGroup}>
-                            <label htmlFor="difficulty">Difficulty</label>
-                            <select
+                            <CustomSelect
                                 id="difficulty"
                                 value={difficulty}
-                                onChange={(e) => setDifficulty(e.target.value)}
-                                className={`${styles.input} ${errors.difficulty ? styles.inputError : ''} ${
-                                    difficulty ? styles.inputFilled : ''
-                                }`}
+                                onChange={(value) => {
+                                    setDifficulty(value);
+                                    setServerErrors({ ...serverErrors, difficulty: "" });
+                                }}
+                                options={difficultyOptions}
+                                placeholder="Select difficulty"
                                 required
-                            >
-                                <option value="">Select difficulty</option>
-                                <option value="easy">Easy</option>
-                                <option value="medium">Medium</option>
-                                <option value="hard">Hard</option>
-                            </select>
-                            {errors.difficulty && <span className={styles.error}>{errors.difficulty}</span>}
+                                error={serverErrors.difficulty}
+                            />
                             {serverErrors.difficulty && (
-                                <span className={styles.error}>{serverErrors.difficulty[0]}</span>
+                                <p className={styles.error}>{serverErrors.difficulty}</p>
                             )}
                         </div>
                         <div className={styles.inputGroup}>
-                            <label htmlFor="constraints">Constraints</label>
-                            <textarea
+                            <CustomSelect
+                                id="status"
+                                value={status}
+                                onChange={(value) => {
+                                    setStatus(value);
+                                    setServerErrors({ ...serverErrors, status: "" });
+                                }}
+                                options={statusOptions}
+                                placeholder="Select status"
+                                required
+                                error={serverErrors.status}
+                            />
+                            {serverErrors.status && (
+                                <p className={styles.error}>{serverErrors.status}</p>
+                            )}
+                        </div>
+                        <div className={styles.inputGroup}>
+                            <Textarea
                                 id="constraints"
                                 value={constraints}
-                                onChange={(e) => setConstraints(e.target.value)}
-                                className={`${styles.input} ${constraints ? styles.inputFilled : ''}`}
+                                onChange={(e) => {
+                                    setConstraints(e.target.value);
+                                    setServerErrors({ ...serverErrors, constraints: "" });
+                                }}
+                                placeholder="Enter constraints"
+                                rows={4}
                             />
                             {serverErrors.constraints && (
-                                <span className={styles.error}>{serverErrors.constraints[0]}</span>
+                                <p className={styles.error}>{serverErrors.constraints}</p>
                             )}
                         </div>
-
                         <div className={styles.inputGroup}>
-                            <label>Tags (press Enter to add)</label>
                             <div className={styles.tagsContainer}>
                                 {tags.map((tag, index) => (
                                     <div key={index} className={styles.tag}>
                                         {tag}
-                                        <button
-                                            type="button"
+                                        <Button
+                                            variant="danger"
                                             onClick={() => removeTag(tag)}
                                             className={styles.removeTag}
                                         >
                                             ×
-                                        </button>
+                                        </Button>
                                     </div>
                                 ))}
-                                <input
+                                <Input
                                     type="text"
                                     value={tagInput}
                                     onChange={(e) => setTagInput(e.target.value)}
                                     onKeyDown={handleTagInput}
-                                    className={styles.tagInput}
                                     placeholder="Add a tag..."
+                                    className={styles.tagInput}
                                 />
                             </div>
                             {serverErrors.tags && (
-                                <span className={styles.error}>{serverErrors.tags[0]}</span>
+                                <p className={styles.error}>{serverErrors.tags}</p>
                             )}
                         </div>
-                        <div className={styles.inputGroup}>
-                            <label htmlFor="status">Status</label>
-                            <select
-                                id="status"
-                                value={status}
-                                onChange={(e) => setStatus(e.target.value)}
-                                className={`${styles.input} ${errors.status ? styles.inputError : ''} ${
-                                    status ? styles.inputFilled : ''
-                                }`}
-                                required
-                            >
-                                <option value="">Select status</option>
-                                <option value="active">Active</option>
-                                <option value="archived">Archived</option>
-                            </select>
-                            {errors.status && <span className={styles.error}>{errors.status}</span>}
-                            {serverErrors.status && <span className={styles.error}>{serverErrors.status[0]}</span>}
-                        </div>
-                        <h3>Test Cases</h3>
+                    </div>
+                    <div className={styles.section}>
+                        <h2 className={styles.sectionTitle}>Test Cases</h2>
                         {testCases.map((testCase, index) => (
                             <div key={index} className={styles.testCaseGroup}>
-                                <div className={styles.inputGroup}>
-                                    <label>Input</label>
-                                    <textarea
-                                        value={testCase.input}
-                                        onChange={(e) => handleTestCaseChange(index, 'input', e.target.value)}
-                                        className={styles.input}
-                                    />
+                                <div className={styles.row}>
+                                    <div className={styles.col}>
+                                        <div className={styles.inputGroup}>
+                                            <Textarea
+                                                value={testCase.input}
+                                                onChange={(e) =>
+                                                    handleTestCaseChange(index, "input", e.target.value)
+                                                }
+                                                placeholder="Enter test case input"
+                                                rows={4}
+                                                required
+                                            />
+                                        </div>
+                                    </div>
+                                    <div className={styles.col}>
+                                        <div className={styles.inputGroup}>
+                                            <Textarea
+                                                value={testCase.expected_output}
+                                                onChange={(e) =>
+                                                    handleTestCaseChange(index, "expected_output", e.target.value)
+                                                }
+                                                placeholder="Enter expected output"
+                                                rows={4}
+                                                required
+                                            />
+                                        </div>
+                                    </div>
                                 </div>
                                 <div className={styles.inputGroup}>
-                                    <label>Expected Output</label>
-                                    <textarea
-                                        value={testCase.expected_output}
-                                        onChange={(e) => handleTestCaseChange(index, 'expected_output', e.target.value)}
-                                        className={styles.input}
+                                    <Checkbox
+                                        id={`is_sample_${index}`}
+                                        checked={testCase.is_sample}
+                                        onChange={(e) =>
+                                            handleTestCaseChange(index, "is_sample", e.target.checked)
+                                        }
+                                        size="large"
+                                        label="Mark as sample"
+                                        variant="switch"
                                     />
-                                </div>
-                                <div className={styles.inputGroup}>
-                                    <label>
-                                        <input
-                                            type="checkbox"
-                                            checked={testCase.is_sample}
-                                            onChange={(e) => handleTestCaseChange(index, 'is_sample', e.target.checked)}
-                                        />
-                                        Mark as sample
-                                    </label>
                                 </div>
                                 {testCases.length > 1 && (
-                                    <button
+                                    <Button
                                         type="button"
+                                        variant="danger"
                                         onClick={() => removeTestCase(index)}
                                         className={styles.removeButton}
                                     >
                                         Remove
-                                    </button>
+                                    </Button>
                                 )}
                             </div>
                         ))}
-                        <button
+                        <Button
                             type="button"
+                            variant="success"
                             onClick={addTestCase}
                             className={styles.addButton}
                         >
                             Add Test Case
-                        </button>
-                        {errors.testCases && <span className={styles.error}>{errors.testCases}</span>}
-
+                        </Button>
+                        {serverErrors.test_cases && (
+                            <p className={styles.error}>{serverErrors.test_cases}</p>
+                        )}
                     </div>
-
                     <div className={styles.actions}>
-                        <button type="submit" className={styles.submitButton} disabled={loading}>
-                            {loading ? 'Updating...' : 'Update Challenge'}
-                        </button>
+                        <Button
+                            type="submit"
+                            variant="secondary-form"
+                            loading={loading}
+                            disabled={loading}
+                        >
+                            Update Challenge
+                        </Button>
                     </div>
                 </div>
             </form>

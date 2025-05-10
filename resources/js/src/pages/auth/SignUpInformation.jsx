@@ -8,12 +8,19 @@ import styles from './SignUp.module.scss';
 
 const SignUpInformation = () => {
   const [role, setRole] = useState('');
+  const [gender, setGender] = useState('');
   const [formData, setFormData] = useState({
     firstname: '',
     lastname: '',
     university: '',
   });
-  const [error, setError] = useState({ firstname: '', lastname: '', role: '', general: '' });
+  const [error, setError] = useState({
+    firstname: '',
+    lastname: '',
+    role: '',
+    gender: '',
+    general: '',
+  });
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
@@ -22,15 +29,32 @@ const SignUpInformation = () => {
     setError({ ...error, role: '' });
   };
 
+  const handleGenderChange = (e) => {
+    setGender(e.target.value);
+    setError({ ...error, gender: '' });
+  };
+
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
+    let sanitizedValue = value;
+
+    if (name === 'firstname' || name === 'lastname') {
+      sanitizedValue = value.replace(/[^a-zA-Z'-]/g, '');
+    }
+
+    setFormData({ ...formData, [name]: sanitizedValue });
     setError({ ...error, [name]: '' });
   };
 
+  const handleSignInClick = () => {
+    localStorage.removeItem('signup_email');
+    localStorage.removeItem('registration_progress');
+  };
+
+
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError({ firstname: '', lastname: '', role: '', general: '' });
+    setError({ firstname: '', lastname: '', role: '', gender: '', general: '' });
     setLoading(true);
 
     const email = localStorage.getItem('signup_email');
@@ -42,6 +66,12 @@ const SignUpInformation = () => {
 
     if (!role) {
       setError({ ...error, role: 'Please select a role' });
+      setLoading(false);
+      return;
+    }
+
+    if (!gender) {
+      setError({ ...error, gender: 'Please select a gender' });
       setLoading(false);
       return;
     }
@@ -60,6 +90,7 @@ const SignUpInformation = () => {
       await axios.post('/api/signup/information', {
         email,
         role,
+        gender,
         firstname: formData.firstname,
         lastname: formData.lastname,
         university: formData.university,
@@ -73,6 +104,7 @@ const SignUpInformation = () => {
           ...error,
           firstname: validationErrors.firstname ? validationErrors.firstname[0] : '',
           lastname: validationErrors.lastname ? validationErrors.lastname[0] : '',
+          gender: validationErrors.gender ? validationErrors.gender[0] : '',
           general: validationErrors.email || validationErrors.role ? 'Invalid data' : '',
         });
       } else {
@@ -86,6 +118,12 @@ const SignUpInformation = () => {
   const roleOptions = [
     { value: 'student', label: 'Student' },
     { value: 'professor', label: 'Professor' },
+  ];
+
+  const genderOptions = [
+    { value: 'male', label: 'Male' },
+    { value: 'female', label: 'Female' },
+    { value: 'other', label: 'Other' },
   ];
 
   return (
@@ -104,6 +142,18 @@ const SignUpInformation = () => {
               required
             />
             {error.role && <p className={styles.error}>{error.role}</p>}
+          </div>
+
+          <div className={styles['form-group']}>
+            <Select
+              id="gender"
+              value={gender}
+              onChange={handleGenderChange}
+              options={genderOptions}
+              placeholder="Gender"
+              required
+            />
+            {error.gender && <p className={styles.error}>{error.gender}</p>}
           </div>
 
           <div className={styles['form-group']}>
@@ -145,9 +195,12 @@ const SignUpInformation = () => {
             />
           </div>
 
-          <Button variant='secondary' type="submit" loading={loading}>
+          <Button variant="form" type="submit" loading={loading}>
             Next
           </Button>
+          <p>
+            Already have an account? <CustomLink to="/login" onClick={handleSignInClick}>Sign in</CustomLink>
+          </p>
         </form>
       </div>
     </div>
