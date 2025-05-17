@@ -26,7 +26,9 @@ class UserResource extends JsonResource
                 'avatar' => $this->profile->avatar ?? null,
                 'bio' => $this->profile->bio ?? null,
                 'university' => $this->profile->university ?? null,
-                'points' => $this->profile->points ?? 1000,
+                'exp' => $this->profile->exp ?? 0,
+                'level' => $this->profile->level ?? 1,
+                'rating' => $this->profile->rating ?? 1000,
                 'win_streak' => $this->profile->win_streak ?? 0,
             //     'rank' => $this->profile->rank ? [
             //         'tier' => $this->profile->rank->tier,

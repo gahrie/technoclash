@@ -5,9 +5,11 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\API\AuthController;
 use App\Http\Controllers\API\SignUpController;
 use App\Http\Controllers\API\UserController;
-use App\Http\Controllers\API\ChallengeProblemController;
+use App\Http\Controllers\API\ProblemController;
 use App\Http\Controllers\API\SubmissionController;
-
+use App\Http\Controllers\API\LevelController;
+use App\Http\Controllers\API\StudentProblemController;
+use App\Http\Controllers\API\CompetitiveController;
 Route::post('/login', [AuthController::class, 'login'])->name('api.login');
 Route::post('/signup/credentials', [SignUpController::class, 'credentials']);
 Route::post('/signup/information', [SignUpController::class, 'information']);
@@ -29,22 +31,46 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/users/create', [UserController::class, 'store']);
     });
 
+    Route::get('/levels/{level}', [LevelController::class, 'show']);
     // List all challenges (GET /api/challenges)
-    Route::get('/challenges', [ChallengeProblemController::class, 'index'])->name('challenges.index');
-    Route::get('/challenges/demographics', [ChallengeProblemController::class, 'demographics']);
-    // Show a specific challenge (GET /api/challenges/{id})
-    Route::get('/challenges/{id}', [ChallengeProblemController::class, 'show'])->name('challenges.show');
-    // Create a new challenge (POST /api/challenges)
-    Route::post('/challenges', [ChallengeProblemController::class, 'store'])->name('challenges.store');
-    // Update an existing challenge (PUT /api/challenges/{id})
-    Route::put('/challenges/{id}', [ChallengeProblemController::class, 'update'])->name('challenges.update');
+    Route::get('/problems', [ProblemController::class, 'index'])->name('problems.index');
+    Route::get('/problems/demographics', [ProblemController::class, 'demographics']);
+    // Show a specific challenge (GET /api/problems/{id})
+    Route::get('/problems/{id}', [ProblemController::class, 'show'])->name('problems.show');
+    // Create a new challenge (POST /api/problems)
+    Route::post('/problems', [ProblemController::class, 'store'])->name('problems.store');
+    // Update an existing challenge (PUT /api/problems/{id})
+    Route::put('/problems/{id}', [ProblemController::class, 'update'])->name('problems.update');
+
+    Route::get('/student/problems', [StudentProblemController::class, 'index']);
+    Route::get('/student/problems/progress', [StudentProblemController::class, 'progress']);
+    Route::get('/student/problems/{id}', [StudentProblemController::class, 'show']);
+    // Delete a challenge (DELETE /api/problems/{id})
+    Route::delete('/problems/{id}', [ProblemController::class, 'destroy'])->name('problems.destroy');
     
-    // Delete a challenge (DELETE /api/challenges/{id})
-    Route::delete('/challenges/{id}', [ChallengeProblemController::class, 'destroy'])->name('challenges.destroy');
-    
-    Route::get('challenge-problems', [ChallengeProblemController::class, 'userChallenges']);
-    Route::get('/challenge-problems/{id}', [ChallengeProblemController::class, 'show']);
     Route::post('/submissions', [SubmissionController::class, 'store']);
     Route::get('/submissions/latest/{challengeProblemId}', [SubmissionController::class, 'latest']);
     Route::post('/logout', [AuthController::class, 'logout'])->name('api.logout');
+
+    
+    Route::middleware('auth:sanctum')->prefix('student/competitive')->group(function () {
+        Route::get('/rooms', [CompetitiveController::class, 'index']);
+        Route::post('/rooms', [CompetitiveController::class, 'store']);
+        Route::post('/rooms/{roomId}/join', [CompetitiveController::class, 'join']);
+        Route::get('/rooms/{roomId}', [CompetitiveController::class, 'getRoom']);
+        Route::post('/rooms/{roomId}/pass-host', [CompetitiveController::class, 'passHost']);
+        Route::post('/rooms/{roomId}/start', [CompetitiveController::class, 'startMatch']);
+        Route::post('/rooms/{roomId}/leave', [CompetitiveController::class, 'leaveRoom']);
+        Route::get('/rank', [CompetitiveController::class, 'getRank']);
+        Route::get('/rooms/{roomId}/match', [CompetitiveController::class, 'getMatch']);
+        Route::post('/rooms/{roomId}/finish', [CompetitiveController::class, 'finishMatch']);
+        Route::post('/rooms/{roomId}/submit', [CompetitiveController::class, 'submitMatchSolution']);
+        Route::post('/rooms/{roomId}/timeout', [CompetitiveController::class, 'timeoutMatch']);
+        Route::get('/pending-rooms', [CompetitiveController::class, 'checkPendingRooms']);
+    });
+
+    Route::get('/user-profiles/{userId}', [SubmissionController::class, 'getUserProfile']);
+    Route::post('/user-profiles/{userId}/update-exp', [SubmissionController::class, 'updateUserExp']);
+    Route::get('/user-problem-progress/{userId}/{problemId}', [SubmissionController::class, 'getUserProblemProgress']);
+    Route::post('/user-problem-progress', [SubmissionController::class, 'updateUserProblemProgress']);
 });

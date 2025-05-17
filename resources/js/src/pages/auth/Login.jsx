@@ -37,10 +37,14 @@ const Login = () => {
                 );
             }
 
-            const validRoles = ["admin", "student", "professor", "guest"];
-            if (validRoles.includes(role)) {
+            const adminRoles = ["Admin", "Professor"];
+            const clientRoles = ["Student"];
+            if (adminRoles.includes(role)) {
                 authLogin(token, role);
-                navigate(`/${role}/dashboard`);
+                navigate(`/${role.toLowerCase()}/dashboard`);
+            } else if (clientRoles.includes(role)) {
+                authLogin(token, role);
+                navigate(`/progressive`);
             } else {
                 throw new Error("Unauthorized role detected");
             }
@@ -55,12 +59,13 @@ const Login = () => {
                         registration_progress
                     );
                     const redirectMap = {
-                        credentials: "/signup/information",
-                        information: "/signup/verification",
+                        Credentials: "/signup/credentials",
+                        Information: "/signup/information",
+                        Verification: "/signup/verification",
                     };
                     navigate(
                         redirectMap[registration_progress] ||
-                            "/signup/information"
+                            "/signup/credentials"
                     );
                 } else if (err.response.status === 401) {
                     setError({
@@ -162,7 +167,7 @@ const Login = () => {
                     </Button>
                 </form>
                 <p>
-                    Don’t have an account?{" "}
+                    Don't have an account?{" "}
                     <Link to="/signup/credentials" className={styles.link}>
                         Sign up
                     </Link>

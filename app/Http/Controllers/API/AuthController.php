@@ -21,7 +21,7 @@ class AuthController extends Controller
         if (Auth::attempt($credentials)) {
             $user = Auth::user();
 
-            if ($user->registration_progress !== 'completed') {
+            if ($user->registration_progress !== 'Completed') {
                 return response()->json([
                     'message' => 'Complete your registration before logging in.',
                     'signup_email' => $user->email,
@@ -31,6 +31,7 @@ class AuthController extends Controller
             $token = $user->createToken('authToken')->plainTextToken;
 
             return response()->json([
+                'user_id' => $user->id,
                 'token' => $token,
                 'name' => $user->profile->first_name . ' ' . $user->profile->last_name,
                 'role' => $user->role,

@@ -10,7 +10,10 @@ export const AuthProvider = ({ children }) => {
         localStorage.getItem("name") || ""
     );
     const [userRole, setUserRole] = useState(
-        localStorage.getItem("role") || "guest"
+        localStorage.getItem("role") || "Guest"
+    );
+    const [userId, setUserId] = useState(
+        localStorage.getItem("user_id") || null
     );
     const [loading, setLoading] = useState(true);
     const [theme, setTheme] = useState("light"); // Default theme
@@ -39,11 +42,13 @@ export const AuthProvider = ({ children }) => {
                     setUserName(
                         `${data.data.profile.first_name} ${data.data.profile.last_name}`
                     );
+                    setUserId(data.data.id);
                     localStorage.setItem(
                         "name",
                         `${data.data.profile.first_name} ${data.data.profile.last_name}`
                     );
                     localStorage.setItem("role", data.data.role);
+                    localStorage.setItem("user_id", data.data.id);
                 })
                 .catch(() => {
                     handleLogout();
@@ -70,6 +75,7 @@ export const AuthProvider = ({ children }) => {
         localStorage.setItem("name", name);
         localStorage.setItem("token", newToken);
         localStorage.setItem("role", role);
+        localStorage.setItem("user_id", userId);
     };
 
     const handleLogout = () => {
@@ -79,10 +85,11 @@ export const AuthProvider = ({ children }) => {
         }).finally(() => {
             setToken(null);
             setUserName("");
-            setUserRole("guest");
+            setUserRole("Guest");
             localStorage.removeItem("name");
             localStorage.removeItem("token");
             localStorage.removeItem("role");
+            localStorage.removeItem("user_id");
         });
     };
 
@@ -100,6 +107,7 @@ export const AuthProvider = ({ children }) => {
                 login,
                 logout: handleLogout,
                 loading,
+                userId,
                 theme,
                 setTheme: updateTheme,
             }}

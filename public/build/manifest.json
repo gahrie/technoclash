@@ -32,15 +32,12 @@
     "src": "resources/js/src/assets/images/section_twooo.svg"
   },
   "resources/js/src/index.jsx": {
-    "file": "assets/index-CpKWK2bx.js",
+    "file": "assets/index-CuV00EnT.js",
     "name": "index",
     "src": "resources/js/src/index.jsx",
     "isEntry": true,
-    "dynamicImports": [
-      "resources/js/src/pages/client/StudentChallengeList.module.scss"
-    ],
     "css": [
-      "assets/index-Vcf_80g5.css"
+      "assets/index-DSRu_65y.css"
     ],
     "assets": [
       "assets/section_onee-Db_Y-jwH.svg",
@@ -51,15 +48,6 @@
       "assets/Verdana-C7PMkQes.ttf",
       "assets/Roboto-WOy3sDCz.ttf",
       "assets/Tomorrow-BS0mjboF.ttf"
-    ]
-  },
-  "resources/js/src/pages/client/StudentChallengeList.module.scss": {
-    "file": "assets/StudentChallengeList.module-CB7k8Ys2.js",
-    "name": "StudentChallengeList.module",
-    "src": "resources/js/src/pages/client/StudentChallengeList.module.scss",
-    "isDynamicEntry": true,
-    "css": [
-      "assets/StudentChallengeList-bJgyCZfi.css"
     ]
   },
   "resources/sass/app.scss": {

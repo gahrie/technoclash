@@ -25,30 +25,6 @@
     gap: 20px;
 }
 
-.ping {
-    font-size: 1rem;
-    font-weight: bold;
-    color: var(--text);
-
-    span {
-        cursor: default;
-        padding: 4px 8px;
-        border-radius: 4px;
-    }
-
-    .low {
-        background-color: #28a745; // Green for ping < 100ms
-    }
-
-    .medium {
-        background-color: #ffc107; // Yellow for 100ms <= ping < 200ms
-    }
-
-    .high {
-        background-color: #dc3545; // Red for ping >= 200ms
-    }
-}
-
 .nav {
     display: flex;
     justify-content: center;
@@ -110,7 +86,6 @@
         list-style: none;
         margin: 0;
 
-
         li {
             display: flex;
             align-items: center;
@@ -168,6 +143,7 @@
 
 .icon {
     margin-right: 8px;
+    color: var(--text);
     font-size: 1.2rem;
 }
 

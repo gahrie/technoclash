@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useOutletContext } from "react-router-dom";
 import axios from "axios";
 import {
@@ -30,6 +30,9 @@ const CreateUser = () => {
     const [role, setRole] = useState("");
     const [password, setPassword] = useState("");
     const [confirmPassword, setConfirmPassword] = useState("");
+    const [level, setLevel] = useState("");
+    const [rating, setRating] = useState("1000");
+    const [exp, setExp] = useState("");
     const [avatarFile, setAvatarFile] = useState(null);
     const [error, setError] = useState({
         firstName: "",
@@ -42,6 +45,9 @@ const CreateUser = () => {
         role: "",
         password: "",
         confirmPassword: "",
+        level: "",
+        rating: "",
+        exp: "",
         avatar: "",
         general: "",
     });
@@ -144,6 +150,22 @@ const CreateUser = () => {
         });
     };
 
+    const fetchMinimumExp = async (level) => {
+        if (!level) return;
+        try {
+            const response = await axios.get(`/api/levels/${level}`, {
+                headers: {
+                    Authorization: `Bearer ${localStorage.getItem("token")}`,
+                },
+            });
+            setExp(response.data.minimum_exp.toString());
+            setError({ ...error, level: "", exp: "" });
+        } catch (err) {
+            setError({ ...error, level: "Invalid level" });
+            setExp("");
+        }
+    };
+
     const handleInputChange = (e, field) => {
         let value = e.target.value;
         switch (field) {
@@ -162,6 +184,10 @@ const CreateUser = () => {
             case "confirmPassword":
                 value = value.replace(/\s/g, "");
                 break;
+            case "level":
+            case "rating":
+                value = value.replace(/[^0-9]/g, "");
+                break;
             default:
                 break;
         }
@@ -169,6 +195,9 @@ const CreateUser = () => {
         setError({ ...error, [field]: "" });
         if (field === "password") {
             checkPasswordStrength(value);
+        }
+        if (field === "level") {
+            fetchMinimumExp(value);
         }
     };
 
@@ -195,6 +224,12 @@ const CreateUser = () => {
             case "confirmPassword":
                 setConfirmPassword(value);
                 break;
+            case "level":
+                setLevel(value);
+                break;
+            case "rating":
+                setRating(value);
+                break;
             default:
                 break;
         }
@@ -211,6 +246,9 @@ const CreateUser = () => {
         setRole("");
         setPassword("");
         setConfirmPassword("");
+        setLevel("");
+        setRating("1000");
+        setExp("");
         setAvatarFile(null);
         setError({
             firstName: "",
@@ -223,6 +261,9 @@ const CreateUser = () => {
             role: "",
             password: "",
             confirmPassword: "",
+            level: "",
+            rating: "",
+            exp: "",
             avatar: "",
             general: "",
         });
@@ -266,6 +307,18 @@ const CreateUser = () => {
             newError.confirmPassword = "Confirm password is required";
             isValid = false;
         }
+        if (!level) {
+            newError.level = "Level is required";
+            isValid = false;
+        }
+        if (!rating) {
+            newError.rating = "Rating is required";
+            isValid = false;
+        }
+        if (!exp) {
+            newError.exp = "Experience points are required";
+            isValid = false;
+        }
         if (avatarFile && !avatarFile.type.startsWith("image/")) {
             newError.avatar = "Please upload a valid image file";
             isValid = false;
@@ -288,6 +341,9 @@ const CreateUser = () => {
             role: "",
             password: "",
             confirmPassword: "",
+            level: "",
+            rating: "",
+            exp: "",
             avatar: "",
             general: "",
         });
@@ -344,6 +400,9 @@ const CreateUser = () => {
         formData.append("role", role);
         formData.append("password", password);
         formData.append("password_confirmation", confirmPassword);
+        formData.append("level", level);
+        formData.append("rating", rating);
+        formData.append("exp", exp);
         formData.append("avatar", file);
 
         try {
@@ -371,6 +430,9 @@ const CreateUser = () => {
                     password: validationErrors.password?.[0] || "",
                     confirmPassword:
                         validationErrors.password_confirmation?.[0] || "",
+                    level: validationErrors.level?.[0] || "",
+                    rating: validationErrors.rating?.[0] || "",
+                    exp: validationErrors.exp?.[0] || "",
                     avatar: validationErrors.avatar?.[0] || "",
                 };
                 setError(newError);
@@ -388,15 +450,15 @@ const CreateUser = () => {
     };
 
     const genderOptions = [
-        { value: "male", label: "Male" },
-        { value: "female", label: "Female" },
-        { value: "other", label: "Other" },
+        { value: "Male", label: "Male" },
+        { value: "Female", label: "Female" },
+        { value: "Other", label: "Other" },
     ];
 
     const roleOptions = [
-        { value: "admin", label: "Admin" },
-        { value: "student", label: "Student" },
-        { value: "professor", label: "Professor" },
+        { value: "Admin", label: "Admin" },
+        { value: "Student", label: "Student" },
+        { value: "Professor", label: "Professor" },
     ];
 
     return (
@@ -533,6 +595,48 @@ const CreateUser = () => {
                                 <p className={styles.error}>
                                     {error.university}
                                 </p>
+                            )}
+                        </div>
+                        <div className={styles.inputGroup}>
+                            <Input
+                                id="level"
+                                type="text"
+                                value={level}
+                                onChange={(e) => handleInputChange(e, "level")}
+                                placeholder="Level (1-50)"
+                                required
+                                min="1"
+                                max="50"
+                            />
+                            {error.level && (
+                                <p className={styles.error}>{error.level}</p>
+                            )}
+                        </div>
+                        <div className={styles.inputGroup}>
+                            <Input
+                                id="rating"
+                                type="text"
+                                value={rating}
+                                onChange={(e) => handleInputChange(e, "rating")}
+                                placeholder="Rating"
+                                required
+                                min="0"
+                            />
+                            {error.rating && (
+                                <p className={styles.error}>{error.rating}</p>
+                            )}
+                        </div>
+                        <div className={styles.inputGroup}>
+                            <Input
+                                id="exp"
+                                type="text"
+                                value={exp}
+                                readOnly
+                                placeholder="Experience Points"
+                                required
+                            />
+                            {error.exp && (
+                                <p className={styles.error}>{error.exp}</p>
                             )}
                         </div>
                     </div>

@@ -3,8 +3,9 @@
 namespace Database\Seeders;
 
 use App\Models\User;
-// use Illuminate\Database\Console\Seeds\WithoutModelEvents;
+use App\Models\UserProfile;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\Hash;
 
 class DatabaseSeeder extends Seeder
 {
@@ -13,11 +14,27 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // User::factory(10)->create();
+        // Create Admin User
+        $admin = User::create([
+            'email' => 'admin@example.com',
+            'password' => Hash::make('admin123'), // Secure password hashing
+            'role' => 'Admin',
+            'email_verified_at' => now(),
+        ]);
 
-        User::factory()->create([
-            'name' => 'Test User',
-            'email' => 'test@example.com',
+        // Create Admin Profile
+        UserProfile::create([
+            'user_id' => $admin->id,
+            'first_name' => 'Admin',
+            'last_name' => 'User',
+            'username' => 'admin',
+            'gender' => 'Male',
+            'bio' => 'Administrator',
+        ]);
+
+        $this->call([
+            RankSeeder::class,
+            LevelSeeder::class,
         ]);
     }
 }

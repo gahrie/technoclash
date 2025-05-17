@@ -170,9 +170,9 @@ const UserList = () => {
     const [userToActivate, setUserToActivate] = useState(null);
 
     const roleOptions = [
-        { value: "admin", label: "Admin", type: "role" },
-        { value: "student", label: "Student", type: "role" },
-        { value: "professor", label: "Professor", type: "role" },
+        { value: "Admin", label: "Admin", type: "role" },
+        { value: "Student", label: "Student", type: "role" },
+        { value: "Professor", label: "Professor", type: "role" },
     ];
 
     const statusOptions = [

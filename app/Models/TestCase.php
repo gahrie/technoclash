@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class TestCase extends Model
 {
     protected $fillable = [
-        'challenge_problem_id',
+        'problem_id',
         'input',
         'expected_output',
         'is_sample',
@@ -19,6 +19,6 @@ class TestCase extends Model
 
     public function problem()
     {
-        return $this->belongsTo(ChallengeProblem::class, 'challenge_problem_id');
+        return $this->belongsTo(Problem::class);
     }
 }

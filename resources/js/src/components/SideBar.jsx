@@ -63,7 +63,7 @@ const Sidebar = () => {
         },
         {
             label: "Problem Bank",
-            path: "/admin/challenges",
+            path: "/admin/problems",
             icon: <FaCode />,
         },
         // {

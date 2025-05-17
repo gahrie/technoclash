@@ -22,7 +22,6 @@ const AuthTopBar = () => {
     const { userRole, userName, logout } = useAuth();
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
     const [isPlayDropdownOpen, setIsPlayDropdownOpen] = useState(false);
-    const [ping, setPing] = useState(0);
     const [theme, setTheme] = useState(Cookies.get("theme") || "light");
     const navigate = useNavigate();
 
@@ -37,20 +36,6 @@ const AuthTopBar = () => {
         document.body.classList.add(theme);
         Cookies.set("theme", theme, { expires: 365 });
     }, [theme]);
-
-    // Simulate ping updates every 5 seconds
-    useEffect(() => {
-        const updatePing = () => {
-            // Simulate ping value (30ms to 300ms)
-            const simulatedPing = Math.floor(Math.random() * 270) + 30;
-            setPing(simulatedPing);
-        };
-
-        updatePing(); // Initial call
-        const pingInterval = setInterval(updatePing, 5000); // Update every 5 seconds
-
-        return () => clearInterval(pingInterval); // Cleanup on unmount
-    }, []);
 
     const toggleDropdown = () => {
         setIsDropdownOpen(!isDropdownOpen);
@@ -69,7 +54,8 @@ const AuthTopBar = () => {
         logout();
     };
 
-    const toggleTheme = () => {
+    const toggleTheme = (event) => {
+        event.stopPropagation(); // Prevent click from bubbling to userInfo
         setTheme(theme === "light" ? "dark" : "light");
     };
 
@@ -87,15 +73,8 @@ const AuthTopBar = () => {
             </div>
 
             <div className={styles.centerContainer}>
-                <div className={styles.ping}>
-                    <span className={ping < 100 ? styles.low : ping < 200 ? styles.medium : styles.high}>
-                        Ping: {ping}ms
-                    </span>
-                </div>
-
                 <nav className={styles.nav}>
                     <ul>
-                        <li onClick={() => navigate("/dashboard")}>Dashboard</li>
                         <li onClick={() => navigate("/classes")}>Classes</li>
                         <li
                             className={styles.playItem}
@@ -111,44 +90,81 @@ const AuthTopBar = () => {
                             {isPlayDropdownOpen && (
                                 <div className={styles.playDropdown}>
                                     <ul>
-                                        <p className={styles.playDropdownTitle}>Select Game Mode</p>
+                                        <p className={styles.playDropdownTitle}>
+                                            Select Game Mode
+                                        </p>
                                         <li
-                                            onClick={() => handlePlayOptionClick("/progressive")}
+                                            onClick={() =>
+                                                handlePlayOptionClick(
+                                                    "/progressive"
+                                                )
+                                            }
                                         >
-                                            <MdStackedLineChart className={styles.dropdownIcon} />
-                                            <div className={styles.playDropdownItem}>
+                                            <MdStackedLineChart
+                                                className={styles.dropdownIcon}
+                                            />
+                                            <div
+                                                className={
+                                                    styles.playDropdownItem
+                                                }
+                                            >
                                                 <p>Progressive</p>
-                                                <span>Hone your skills through practice</span>
+                                                <span>
+                                                    Hone your skills through
+                                                    practice
+                                                </span>
                                             </div>
                                         </li>
                                         <li
-                                            onClick={() => handlePlayOptionClick("/competitive")}
+                                            onClick={() =>
+                                                handlePlayOptionClick(
+                                                    "/competitive"
+                                                )
+                                            }
                                         >
-                                            <FaTrophy className={styles.dropdownIcon} />
-                                            <div className={styles.playDropdownItem}>
+                                            <FaTrophy
+                                                className={styles.dropdownIcon}
+                                            />
+                                            <div
+                                                className={
+                                                    styles.playDropdownItem
+                                                }
+                                            >
                                                 <p>Competitive</p>
-                                                <span>Compete against others for glory</span>
+                                                <span>
+                                                    Compete against others for
+                                                    glory
+                                                </span>
                                             </div>
                                         </li>
                                         <li className={styles.disabled}>
-                                            <FaLock className={styles.dropdownIcon} />
-                                            <div className={styles.playDropdownItem}>
+                                            <FaLock
+                                                className={styles.dropdownIcon}
+                                            />
+                                            <div
+                                                className={
+                                                    styles.playDropdownItem
+                                                }
+                                            >
                                                 <p>Contest (Coming Soon)</p>
-                                                <span>Scheduled competitive events</span>
+                                                <span>
+                                                    Scheduled competitive events
+                                                </span>
                                             </div>
                                         </li>
                                     </ul>
                                 </div>
                             )}
                         </li>
-                        <li onClick={() => navigate("/client/leaderboard")}>Leaderboard</li>
-                        <li onClick={() => navigate("/client/settings")}>Store</li>
+                        <li onClick={() => navigate("/client/leaderboard")}>
+                            Leaderboard
+                        </li>
                     </ul>
                 </nav>
             </div>
 
             <div className={styles.user}>
-                <div className={styles.userInfo} onClick={toggleDropdown}>
+                <div className={styles.userInfo}>
                     <ul className={styles.userIcons}>
                         <li>
                             <FaBell className={styles.icon} />
@@ -162,7 +178,10 @@ const AuthTopBar = () => {
                         </li>
                     </ul>
                     <FaUserCircle className={styles.avatar} />
-                    <div className={styles.userDetails}>
+                    <div
+                        className={styles.userDetails}
+                        onClick={toggleDropdown}
+                    >
                         <span className={styles.name}>{user.name}</span>
                         <span className={styles.role}>{user.role}</span>
                     </div>

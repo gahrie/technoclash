@@ -22,18 +22,19 @@ import AdminDashboard from './pages/admin/AdminDashboard';
 import UserList from './pages/admin/UserList';
 import CreateUser from './pages/admin/CreateUser';
 import UpdateUser from './pages/admin/UpdateUser';
-import ChallengeList from './pages/admin/ChallengeList';
-import ViewChallenge from './pages/admin/ViewChallenge';
-import CreateChallenge from './pages/admin/CreateChallenge';
-import UpdateChallenge from './pages/admin/UpdateChallenge';
+import ProblemList from './pages/admin/ProblemList';
+import CreateProblem from './pages/admin/CreateProblem';
+import UpdateProblem from './pages/admin/UpdateProblem';
 
 // Student Pages
-import StudentChallengeList from './pages/client/StudentChallengeList';
 import StudentChallengeDetail from './pages/client/StudentChallengeDetail';
-
+import StudentProblemList from './pages/client/StudentProblemList';
+import CompetitiveList from './pages/client/CompetitiveList';
+import Room from './pages/client/Room';
+import CompetitiveMatch from './pages/client/CompetitiveMatch';
 
 import { UserListProvider } from "./context/UserListContext"; // Adjust path
-import { ChallengeListProvider } from "./context/ChallengeListContext"; // Adjust path
+import { ProblemListProvider } from "./context/ProblemListContext"; // Adjust path
 
 
 // Route configurations
@@ -48,16 +49,16 @@ export const routes = [
 
   {
     element: <GuestLayout />,
-    allowedRoles: ['guest'],
+    allowedRoles: ['Guest'],
     children : [
       { path: '/', element: <Home /> },
-      { path: '/login', element: <Login />, allowedRoles: ['guest'] },
+      { path: '/login', element: <Login /> },
     ],
   },
   // Signup Routes
   {
     element: <GuestLayout />,
-    allowedRoles: ['guest'],
+    allowedRoles: ['Guest'],
     children: [
       { path: '/signup/credentials', element: <SignUpCredentials />, isSignup: true },
       { path: '/signup/information', element: <SignUpInformation />, isSignup: true },
@@ -68,32 +69,34 @@ export const routes = [
   // Admin Routes
   {
     element: <AdminLayout />,
-    allowedRoles: ['admin'],
+    allowedRoles: ['Admin'],
     children: [
       { path: '/admin/dashboard', element: <AdminDashboard /> },
       { path: '/admin/users', element: <UserListProvider><UserList /></UserListProvider> },
       { path: '/admin/users/create', element: <CreateUser /> },
       { path: '/admin/users/:id/edit', element: <UpdateUser /> },
-      { path: '/admin/challenges', element: <ChallengeListProvider><ChallengeList /></ChallengeListProvider> },
-      { path: '/admin/challenges/:id', element: <ViewChallenge /> },
-      { path: '/admin/challenges/create', element: <CreateChallenge /> },
-      { path: '/admin/challenges/:id/edit', element: <UpdateChallenge /> },
+      { path: '/admin/problems', element: <ProblemListProvider><ProblemList /></ProblemListProvider> },
+      { path: '/admin/problems/create', element: <CreateProblem /> },
+      { path: '/admin/problems/:id/edit', element: <UpdateProblem /> },
     ],
   },
   // Student Routes
   {
     element: <StudentLayout />,
-    allowedRoles: ['student'],
+    allowedRoles: ['Student'],
     children: [
       { path: '/dashboard', element: <div>Student Dashboard</div> },
-      { path: '/progressive', element: <StudentChallengeList /> },
+      { path: '/progressive', element: <StudentProblemList /> },
       { path: '/progressive/:id', element: <StudentChallengeDetail /> },
+      { path: '/competitive', element: <CompetitiveList /> },
+      { path: '/competitive/room/:roomId', element: <Room /> },
+      { path: '/competitive/match/:roomId', element: <CompetitiveMatch /> },
     ],
   },
   // Professor Routes
   {
     element: <ProfessorLayout />,
-    allowedRoles: ['professor'],
+    allowedRoles: ['Professor'],
     children: [
       { path: '/professor/dashboard', element: <div>Professor Dashboard</div> },
     ],

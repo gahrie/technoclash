@@ -4,7 +4,7 @@ import { Navigate, useLocation } from 'react-router-dom';
 import { useAuth } from './context/AuthContext';
 
 const RouteGuard = ({ route }) => {
-  const { token, userRole, loading } = useAuth();
+  const { userRole, loading } = useAuth();
   const { element, allowedRoles, isSignup } = route;
   const location = useLocation();
   const currentPath = location.pathname;
@@ -23,15 +23,14 @@ const RouteGuard = ({ route }) => {
     const signupEmail = localStorage.getItem('signup_email');
     const registrationProgress = localStorage.getItem('registration_progress') || '';
     const signupProgressMap = {
-      '/signup/credentials': '',
-      '/signup/information': 'credentials',
-      '/signup/verification': 'information',
-      '/signup/completed': 'completed',
+      '/signup/credentials': 'Credentials',
+      '/signup/information': 'Information',
+      '/signup/verification': 'Verification',
     };
     const progressRedirectMap = {
-      credentials: '/signup/information',
-      information: '/signup/verification',
-      completed: '/signup/completed',
+      Credentials: '/signup/credentials',
+      Information: '/signup/information',
+      Verification: '/signup/verification',
     };
 
     if (currentPath === '/signup/credentials' && registrationProgress) {
@@ -43,7 +42,7 @@ const RouteGuard = ({ route }) => {
       return <Navigate to="/signup/credentials" replace />;
     }
 
-    const progressOrder = ['credentials', 'information', 'completed'];
+    const progressOrder = ['Credentials', 'Information', 'Verification'];
     const requiredProgress = signupProgressMap[currentPath];
     const currentProgressIndex = progressOrder.indexOf(registrationProgress);
     const requiredProgressIndex = progressOrder.indexOf(requiredProgress);
@@ -58,14 +57,18 @@ const RouteGuard = ({ route }) => {
   }
 
   // Role-based access control (only if allowedRoles is defined)
+  console.log(userRole);
+  console.log(allowedRoles);
+  console.log(currentPath);
+
   if (allowedRoles && !allowedRoles.includes(userRole)) {
     // Redirect to appropriate dashboard or home
     switch (userRole) {
-      case 'admin':
+      case 'Admin':
         return <Navigate to="/admin/dashboard" replace />;
-      case 'student':
-        return <Navigate to="/student/dashboard" replace />;
-      case 'professor':
+      case 'Student':
+        return <Navigate to="/progressive" replace />;
+      case 'Professor':
         return <Navigate to="/professor/dashboard" replace />;
       default:
         return <Navigate to="/" replace />;

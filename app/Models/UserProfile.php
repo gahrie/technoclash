@@ -15,7 +15,9 @@ class UserProfile extends Model
         'avatar',
         'bio',
         'university',
-        'points',
+        'exp',
+        'level',
+        'rating',
         'win_streak',
     ];
 

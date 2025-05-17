@@ -8,7 +8,7 @@ class Submission extends Model
 {
     protected $fillable = [
         'user_id',
-        'challenge_problem_id',
+        'problem_id',
         'language_id',
         'source_code',
         'status',
@@ -23,8 +23,8 @@ class Submission extends Model
         return $this->belongsTo(User::class);
     }
 
-    public function challengeProblem()
+    public function problem()
     {
-        return $this->belongsTo(ChallengeProblem::class);
+        return $this->belongsTo(Problem::class);
     }
 }

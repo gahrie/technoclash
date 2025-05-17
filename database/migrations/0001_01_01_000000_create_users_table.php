@@ -16,7 +16,11 @@ return new class extends Migration
             $table->string('email')->unique();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
-            $table->string('role')->default('student'); // Default role is 'student'
+            $table->enum('role', ['Student', 'Professor', 'Admin'])->default('Student'); // Default role is 'student'
+            $table->enum('status', ['Active', 'Inactive'])->default('Active');
+            $table->enum('registration_progress', ['Credentials', 'Information', 'Verification', 'Completed'])->default('Credentials');
+            $table->string('verification_code')->nullable();
+            $table->timestamp('verification_code_expires_at')->nullable();
             $table->rememberToken();
             $table->timestamps();
         });

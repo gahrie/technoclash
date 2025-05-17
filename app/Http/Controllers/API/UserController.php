@@ -13,6 +13,8 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\DB;
+
 class UserController extends Controller
 {
     /**
@@ -40,6 +42,7 @@ class UserController extends Controller
             $query->whereIn('status', $status);
         }
 
+        
         if ($search) {
             $query->where(function ($q) use ($search) {
                 $q->where('email', 'like', "%{$search}%")
@@ -57,7 +60,6 @@ class UserController extends Controller
                 $query->join('user_profiles', 'users.id', '=', 'user_profiles.user_id')
                 ->orderBy('user_profiles.first_name', $sortDirection)
                 ->orderBy('user_profiles.last_name', $sortDirection);
-
             } else {
                 $query->orderBy($sortBy, $sortDirection);
             }
@@ -76,6 +78,7 @@ class UserController extends Controller
             ],
         ]);
     }
+
     /**
      * Store a newly created resource in storage.
      */
@@ -85,11 +88,11 @@ class UserController extends Controller
             'first_name' => ['required', 'string', 'max:255', 'regex:/^[a-zA-Z\'-]+$/'],
             'last_name' => ['required', 'string', 'max:255', 'regex:/^[a-zA-Z\'-]+$/'],
             'username' => ['required', 'string', 'max:255', 'regex:/^[a-zA-Z0-9]+$/', 'unique:user_profiles'],
-            'gender' => ['required', 'in:male,female,other'],
+            'gender' => ['required', 'in:Male,Female,Other'],
             'bio' => ['nullable', 'string'],
             'university' => ['nullable', 'string', 'max:255', 'regex:/^[a-zA-Z\s]+$/'],
             'email' => ['required', 'email', 'max:255', 'unique:users'],
-            'role' => ['required', 'in:admin,student,professor'],
+            'role' => ['required', 'in:Admin,Student,Professor'],
             'password' => [
                 'required',
                 'min:8',
@@ -99,6 +102,9 @@ class UserController extends Controller
                 'regex:/[!@#$%^&*(),_.?":{}|<>]/',
                 'confirmed'
             ],
+            'level' => ['required', 'integer', 'min:1', 'max:50'],
+            'rating' => ['required', 'integer', 'min:0'],
+            'exp' => ['required', 'integer', 'min:0'],
             'avatar' => ['nullable', 'image', 'mimes:png', 'max:2048'],
         ], [
             'first_name.regex' => 'First name can only contain letters, hyphens, and apostrophes.',
@@ -109,7 +115,22 @@ class UserController extends Controller
             'password.regex' => 'Password must contain at least 1 uppercase letter, 1 lowercase letter, 1 number, and 1 special character.',
             'avatar.mimes' => 'Avatar must be a PNG file.',
             'avatar.max' => 'Avatar cannot exceed 2MB.',
+            'level.min' => 'Level must be at least 1.',
+            'level.max' => 'Level cannot exceed 50.',
+            'rating.min' => 'Rating cannot be negative.',
+            'exp.min' => 'Experience points cannot be negative.',
         ]);
+
+        // Validate exp against minimum_exp for the level
+        $levelData = DB::table('levels')->where('level', $request->level)->first();
+        if (!$levelData) {
+            return response()->json(['message' => 'Invalid level'], 422);
+        }
+        if ($request->exp < $levelData->minimum_exp) {
+            return response()->json([
+                'message' => "Experience points must be at least {$levelData->minimum_exp} for level {$request->level}"
+            ], 422);
+        }
 
         // Create avatars directory if it doesn't exist
         Storage::disk('public')->makeDirectory('avatars');
@@ -138,7 +159,9 @@ class UserController extends Controller
             'avatar' => $avatarPath ?? null,
             'bio' => $request->bio ?? null,
             'university' => $request->university ? strtoupper($request->university) : null,
-            'points' => 1000,
+            'exp' => $request->exp,
+            'level' => $request->level,
+            'rating' => $request->rating,
             'win_streak' => 0,
         ]);
 
@@ -180,7 +203,7 @@ class UserController extends Controller
                 'regex:/^[a-zA-Z0-9]+$/',
                 Rule::unique('user_profiles')->ignore($userProfile->id),
             ],
-            'gender' => ['required', 'in:male,female,other'],
+            'gender' => ['required', 'in:Male,Female,Other'],
             'bio' => ['nullable', 'string'],
             'university' => ['nullable', 'string', 'max:255', 'regex:/^[a-zA-Z\s]+$/'],
             'email' => [
@@ -189,7 +212,7 @@ class UserController extends Controller
                 'max:255',
                 Rule::unique('users')->ignore($user->id),
             ],
-            'role' => ['required', 'in:admin,student,professor'],
+            'role' => ['required', 'in:Admin,Student,Professor'],
             'password' => [
                 'nullable',
                 'min:8',
@@ -199,6 +222,9 @@ class UserController extends Controller
                 'regex:/[!@#$%^&*(),_.?":{}|<>]/',
                 'confirmed',
             ],
+            'level' => ['required', 'integer', 'min:1', 'max:50'],
+            'rating' => ['required', 'integer', 'min:0'],
+            'exp' => ['required', 'integer', 'min:0'],
             'avatar' => ['nullable', 'image', 'mimes:png', 'max:2048'],
         ], [
             'first_name.regex' => 'First name can only contain letters, hyphens, and apostrophes.',
@@ -209,7 +235,22 @@ class UserController extends Controller
             'password.regex' => 'Password must contain at least 1 uppercase letter, 1 lowercase letter, 1 number, and 1 special character.',
             'avatar.mimes' => 'Avatar must be a PNG file.',
             'avatar.max' => 'Avatar cannot exceed 2MB.',
+            'level.min' => 'Level must be at least 1.',
+            'level.max' => 'Level cannot exceed 50.',
+            'rating.min' => 'Rating cannot be negative.',
+            'exp.min' => 'Experience points cannot be negative.',
         ]);
+
+        // Validate exp against minimum_exp for the level
+        $levelData = DB::table('levels')->where('level', $request->level)->first();
+        if (!$levelData) {
+            return response()->json(['message' => 'Invalid level'], 422);
+        }
+        if ($request->exp < $levelData->minimum_exp) {
+            return response()->json([
+                'message' => "Experience points must be at least {$levelData->minimum_exp} for level {$request->level}"
+            ], 422);
+        }
 
         // Create avatars directory if it doesn't exist
         Storage::disk('public')->makeDirectory('avatars');
@@ -239,6 +280,9 @@ class UserController extends Controller
             'avatar' => $avatarPath,
             'bio' => $validated['bio'] ?? null,
             'university' => $validated['university'] ? strtoupper($validated['university']) : null,
+            'exp' => $validated['exp'],
+            'level' => $validated['level'],
+            'rating' => $validated['rating'],
         ]);
 
         return response()->json([
@@ -265,25 +309,24 @@ class UserController extends Controller
     {
         $user = User::findOrFail($id);
 
-        // Set the user's status to inactive
+        // Set the user's status to active
         $user->status = 'Activated';
         $user->save();
         return response()->json([
             'message' => 'User activated successfully',
         ], 200);
     }
+
     /**
      * Retrieve demographic data for users.
-     *
-     * @return \Illuminate\Http\JsonResponse
      */
     public function demographics()
     {
         try {
             $totalUsers = User::count();
-            $totalAdmins = User::where('role', 'admin')->count();
-            $totalProfessors = User::where('role', 'professor')->count();
-            $totalStudents = User::where('role', 'student')->count();
+            $totalAdmins = User::where('role', 'Admin')->count();
+            $totalProfessors = User::where('role', 'Professor')->count();
+            $totalStudents = User::where('role', 'Student')->count();
             $totalActive = User::where('status', 'Activated')->count();
             $totalInactive = User::where('status', 'Deactivated')->count();
 
@@ -306,6 +349,7 @@ class UserController extends Controller
             ], 500);
         }
     }
+
     /**
      * Remove the specified resource from storage.
      */
